@@ -239,7 +239,12 @@ This would force all pods in this namespace to fall between .250 by 256Mi and .7
 [%collapsible]
 ====
 Since all workloads leverage a service account, you can find the token using your Linux filesystem skills. + 
-`oc exec -it "POD_NAME" -- sh` will get you into a pod's context.
+This command will get you into a pod's context:
+
+[source,sh,role=execute]
+----
+oc exec -it "POD_NAME" -- sh
+----
 ====
 
 *How long do service account tokens created with `oc create token` last?*

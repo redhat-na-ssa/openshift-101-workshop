@@ -89,7 +89,12 @@ Start with what you know:
 * Is the pod stuck in a particular state?
 * Are users reporting specific errors or timeouts?
 
-Use `oc get pods` to quickly scan for anomalies in pod status.
+Quickly scan for anomalies in pod status with:
+
+[source,sh,role=execute]
+----
+oc get pods
+----
 
 === 2. Gather Context
 

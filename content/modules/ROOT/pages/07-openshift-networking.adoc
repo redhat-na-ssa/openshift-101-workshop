@@ -204,8 +204,18 @@ Additional annotations for `Route` definition are available with this method::
 [%collapsible]
 ====
 .Yes! Two separate ways in fact:
-* Insecure Routes: `oc expose service "SERVICE_NAME"`
-* Secure Routes: `oc create route (edge|passthrough|reencrypt) --service "SERVICE_NAME" ...`
+* Insecure Routes:
++
+[source,sh,role=execute]
+----
+oc expose service "SERVICE_NAME"
+----
+* Secure Routes:
++
+[source,sh,role=execute]
+----
+oc create route (edge|passthrough|reencrypt) --service "SERVICE_NAME" ...
+----
 ====
 
 *What happens when you delete a `Route` that has been created from an `Ingress` resource?*
