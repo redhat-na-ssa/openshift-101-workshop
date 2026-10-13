@@ -261,8 +261,15 @@ metadata:
     kubernetes.io/service-account.name: autoscaler
 EOF
 
-oc create role thanos-metrics-reader -n default --verb=get,list,watch --resource=pods,pods.metrics.k8s.io
-oc create rolebinding thanos-metrics-reader -n default --role=thanos-metrics-reader --serviceaccount=default:autoscaler
+oc create role thanos-metrics-reader \
+  -n default \
+  --verb=get,list,watch \
+  --resource=pods,pods.metrics.k8s.io
+
+oc create rolebinding thanos-metrics-reader \
+  -n default \
+  --role=thanos-metrics-reader \
+  --serviceaccount=default:autoscaler
 ----
 
 Then configure a ScaledObject resource that uses the Prometheus trigger:

@@ -146,7 +146,9 @@ Behind the scenes, OpenShift handles tracking and pulling the actual image so th
 +
 [source,sh,role=execute]
 ----
-oc policy add-role-to-user system:image-puller system:serviceaccount:test:default --namespace=default
+oc policy add-role-to-user system:image-puller \
+  system:serviceaccount:test:default \
+  --namespace=default
 ----
 ====
 
@@ -172,7 +174,10 @@ Here’s an example command:
 
 [source,sh,role=execute]
 ----
-oc adm prune images --keep-tag-revisions=3 --keep-younger-than=60m --confirm
+oc adm prune images \
+  --keep-tag-revisions=3 \
+  --keep-younger-than=60m \
+  --confirm
 ----
 
 This tells OpenShift to:
@@ -190,7 +195,9 @@ Without the `--confirm` flag, the command runs in dry-run mode and only previews
 
 [source,sh,role=execute]
 ----
-oc adm prune images --keep-tag-revisions=3 --keep-younger-than=60m
+oc adm prune images \
+  --keep-tag-revisions=3 \
+  --keep-younger-than=60m
 ----
 
 This is especially useful in production clusters where caution is critical.

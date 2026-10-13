@@ -161,7 +161,9 @@ metadata:
 [source,sh,role=execute]
 ----
 # To add an annotation
-oc annotate route "ROUTE_NAME" -n "NAMESPACE" "ANNOTATION_KEY"="ANNOTATION_VALUE"
+oc annotate route "ROUTE_NAME" \
+  -n "NAMESPACE" \
+  "ANNOTATION_KEY"="ANNOTATION_VALUE"
 # To remove an annotation
 oc annotate route "ROUTE_NAME" -n "NAMESPACE" "ANNOTATION_KEY"-
 ----
