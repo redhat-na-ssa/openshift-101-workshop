@@ -222,8 +222,9 @@ The process for taking what we have and packaging it with helm is more involved 
 .Create a new project for the chart
 [source,sh,role=execute]
 ----
-# In a new project, "new-app" renders every resource the chart needs (including the
-# ImageStream for the base image), and none of them already exist outside of Helm
+# In a new project, "new-app" renders every resource the chart needs
+# (including the ImageStream for the base image), and none of them
+# already exist outside of Helm
 oc new-project cart-helm
 ----
 
@@ -244,7 +245,8 @@ rm -r templates/*
 .Push the generated resources into the "templates" directory
 [source,sh,role=execute]
 ----
-# Add "-o yaml" to our previous "new-app" command and dump it to a file
+# Add "-o yaml" to our previous "new-app" command and dump it
+# to a file
 oc new-app https://github.com/shpwrck/retail-store-sample-app \
   --name test-cart \
   --context-dir ./src/cart \

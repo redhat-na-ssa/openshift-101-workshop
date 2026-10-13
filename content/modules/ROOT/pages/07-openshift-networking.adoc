@@ -59,7 +59,9 @@ In many situations (particularly in cloud based environments) these four are suf
 .Notice the output here:
 [source,sh,role=execute]
 ----
-oc exec deployment/router-default -n openshift-ingress -- sh -c "ps -ef"
+oc exec deployment/router-default \
+  -n openshift-ingress -- \
+  sh -c "ps -ef"
 ----
 
 === Path-Based Routing
@@ -216,7 +218,8 @@ oc expose service "SERVICE_NAME"
 +
 [source,sh,role=execute]
 ----
-oc create route (edge|passthrough|reencrypt) --service "SERVICE_NAME" ...
+oc create route (edge|passthrough|reencrypt) \
+  --service "SERVICE_NAME" ...
 ----
 ====
 

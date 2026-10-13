@@ -56,7 +56,8 @@ oc extract secret/"SECRET_NAME" --to=- --keys=token
 [source,sh,role=execute]
 ----
 REM Run this in the project that contains the service account
-echo {"apiVersion":"v1","kind":"Secret","metadata":{"name":"SECRET_NAME","annotations":{"kubernetes.io/service-account.name":"SERVICE_ACCOUNT_NAME"}},"type":"kubernetes.io/service-account-token"} | oc apply -f -
+echo {"apiVersion":"v1","kind":"Secret","metadata":{"name":"SECRET_NAME","annotations":{"kubernetes.io/service-account.name":"SERVICE_ACCOUNT_NAME"}},"type":"kubernetes.io/service-account-token"} | ^
+  oc apply -f -
 oc extract secret/"SECRET_NAME" --to=- --keys=token
 ----
 

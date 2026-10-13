@@ -26,7 +26,8 @@ diff <(oc get ns default -o yaml) <(oc get project default -o yaml)
 .Windows
 [source,sh,role=execute]
 ----
-# Create a file with the YAML definition of each resource and compare them
+# Create a file with the YAML definition of each resource
+# and compare them
 oc get namespace default -o yaml > %Temp%\default-namespace.yaml
 oc get project default -o yaml > %Temp%\default-project.yaml
 FC %Temp%\default-namespace.yaml %Temp%\default-project.yaml
@@ -61,8 +62,14 @@ diff \
 # while the new namespace does not.
 oc new-project example-project
 oc create ns example-ns
-oc get rolebindings -n example-project -o name > %Temp%\rolebindings-project.yaml
-oc get rolebindings -n example-ns -o name > %Temp%\rolebindings-namespace.yaml
+oc get rolebindings ^
+  -n example-project ^
+  -o name ^
+  > %Temp%\rolebindings-project.yaml
+oc get rolebindings ^
+  -n example-ns ^
+  -o name ^
+  > %Temp%\rolebindings-namespace.yaml
 FC %Temp%\rolebindings-project.yaml %Temp%\rolebindings-namespace.yaml
 ----
 
@@ -75,9 +82,11 @@ That `admin` rolebinding comes from the default project template. To change what
 oc adm create-bootstrap-project-template -o yaml \
   > /tmp/project-template.yaml
 
-# Edit the file and add your own resources (for example a ResourceQuota
-# or LimitRange) to the "objects" list, then install it
-oc apply -n openshift-config -f /tmp/project-template.yaml
+# Edit the file and add your own resources (for example a
+# ResourceQuota or LimitRange) to the "objects" list, then install it
+oc apply \
+  -n openshift-config \
+  -f /tmp/project-template.yaml
 oc patch project.config.openshift.io/cluster \
   --type=json \
   -p '[{"op":"add","path":"/spec/projectRequestTemplate","value":{"name":"project-request"}}]'
@@ -87,12 +96,17 @@ oc patch project.config.openshift.io/cluster \
 [source,sh,role=execute]
 ----
 # Export the default project template to a file
-oc adm create-bootstrap-project-template -o yaml > %Temp%\project-template.yaml
+oc adm create-bootstrap-project-template -o yaml ^
+  > %Temp%\project-template.yaml
 
-# Edit the file and add your own resources (for example a ResourceQuota
-# or LimitRange) to the "objects" list, then install it
-oc apply -n openshift-config -f %Temp%\project-template.yaml
-oc patch project.config.openshift.io/cluster --type=json -p "[{\"op\":\"add\",\"path\":\"/spec/projectRequestTemplate\",\"value\":{\"name\":\"project-request\"}}]"
+# Edit the file and add your own resources (for example a
+# ResourceQuota or LimitRange) to the "objects" list, then install it
+oc apply ^
+  -n openshift-config ^
+  -f %Temp%\project-template.yaml
+oc patch project.config.openshift.io/cluster ^
+  --type=json ^
+  -p "[{\"op\":\"add\",\"path\":\"/spec/projectRequestTemplate\",\"value\":{\"name\":\"project-request\"}}]"
 ----
 
 [NOTE]
@@ -171,14 +185,16 @@ You can confirm this by running:
 [source,sh,role=execute]
 ----
 # View the running configuration that indicates KubeProxy status
-oc get network.operator.openshift.io cluster -o yaml | grep deployKubeProxy
+oc get network.operator.openshift.io cluster -o yaml |
+  grep deployKubeProxy
 ----
 
 .Windows
 [source,sh,role=execute]
 ----
 # View the running configuration that indicates KubeProxy status
-oc get network.operator.openshift.io cluster -o yaml | FINDSTR deployKubeProxy
+oc get network.operator.openshift.io cluster -o yaml | ^
+  FINDSTR deployKubeProxy
 ----
 
 == Security
