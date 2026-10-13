@@ -66,8 +66,13 @@ Grab your client of choice `podman` or `docker` (links below) and try the follow
 .Build, tag, and label the image
 [source,sh,role=execute]
 ----
-# From the source repository root (src/cart is the build context; docker requires it explicitly)
-podman build --file src/cart/Dockerfile --tag cart:0.0.1 --label build-0.0.1 src/cart
+# From the source repository root (src/cart is the build context;
+# docker requires it explicitly)
+podman build \
+  --file src/cart/Dockerfile \
+  --tag cart:0.0.1 \
+  --label build-0.0.1 \
+  src/cart
 ----
 
 .Find the built image
@@ -88,7 +93,11 @@ podman inspect localhost/cart:0.0.1
 [source,sh,role=execute]
 ----
 # From anywhere
-podman run --name cart-0.0.1 -d -p 8080:8080 localhost/cart:0.0.1
+podman run \
+  --name cart-0.0.1 \
+  -d \
+  -p 8080:8080 \
+  localhost/cart:0.0.1
 ----
 
 .Test the image
@@ -119,9 +128,15 @@ Assuming that the architecture of your own build environment is the same as your
 .Build Once
 [source,sh,role=execute]
 ----
-# "oc create build" does not create the output ImageStream, so create it first
+# "oc create build" does not create the output ImageStream,
+# so create it first
 oc create imagestream cart
-oc create build cart --strategy Docker --source-git=https://github.com/shpwrck/retail-store-sample-app --context-dir=./src/cart --dockerfile-path=. --to-image-stream cart:0.0.1
+oc create build cart \
+  --strategy Docker \
+  --source-git=https://github.com/shpwrck/retail-store-sample-app \
+  --context-dir=./src/cart \
+  --dockerfile-path=. \
+  --to-image-stream cart:0.0.1
 ----
 
 If you run the `oc create build` command again, it will fail (by design). We need a generative way to produce builds repeatedly. That is where `BuildConfigs` come in. +
@@ -133,7 +148,10 @@ If you run the `oc create build` command again, it will fail (by design). We nee
 .Build Repeatably 
 [source,sh,role=execute]
 ----
-oc new-build https://github.com/shpwrck/retail-store-sample-app --strategy docker --context-dir=./src/cart --to cart:0.0.1
+oc new-build https://github.com/shpwrck/retail-store-sample-app \
+  --strategy docker \
+  --context-dir=./src/cart \
+  --to cart:0.0.1
 ----
 
 .Trigger Build
@@ -167,7 +185,9 @@ The next step after accomplishing reliable/repeatable builds is deployment. We c
 .Create a new build and a running 'Deployment'
 [source,sh,role=execute]
 ----
-oc new-app https://github.com/shpwrck/retail-store-sample-app --name test-cart --context-dir ./src/cart
+oc new-app https://github.com/shpwrck/retail-store-sample-app \
+  --name test-cart \
+  --context-dir ./src/cart
 ----
 or
 
@@ -176,7 +196,8 @@ or
 ----
 # This command borrows the image from our previous builds
 # Replace "NAMESPACE" with your current project (oc project -q)
-oc create deployment test-cart-deployment --image image-registry.openshift-image-registry.svc:5000/"NAMESPACE"/test-cart:latest
+oc create deployment test-cart-deployment \
+  --image image-registry.openshift-image-registry.svc:5000/"NAMESPACE"/test-cart:latest
 ----
 
 These two commands do greatly oversimplify the capabilities that OpenShift has in regards to running workloads. +
@@ -201,8 +222,9 @@ The process for taking what we have and packaging it with helm is more involved 
 .Create a new project for the chart
 [source,sh,role=execute]
 ----
-# In a new project, "new-app" renders every resource the chart needs (including the
-# ImageStream for the base image), and none of them already exist outside of Helm
+# In a new project, "new-app" renders every resource the chart needs
+# (including the ImageStream for the base image), and none of them
+# already exist outside of Helm
 oc new-project cart-helm
 ----
 
@@ -223,8 +245,13 @@ rm -r templates/*
 .Push the generated resources into the "templates" directory
 [source,sh,role=execute]
 ----
-# Add "-o yaml" to our previous "new-app" command and dump it to a file
-oc new-app https://github.com/shpwrck/retail-store-sample-app --name test-cart --context-dir ./src/cart -o yaml > templates/resources.yaml
+# Add "-o yaml" to our previous "new-app" command and dump it
+# to a file
+oc new-app https://github.com/shpwrck/retail-store-sample-app \
+  --name test-cart \
+  --context-dir ./src/cart \
+  -o yaml \
+  > templates/resources.yaml
 ----
 
 .Install Helm Chart

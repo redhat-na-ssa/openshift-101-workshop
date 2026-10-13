@@ -142,8 +142,14 @@ Behind the scenes, OpenShift handles tracking and pulling the actual image so th
 * ImageStreams can track images from many sources: external registries, the internal OpenShift registry, or even from builds running inside the cluster.
 * Deployments can be redeployed automatically when an ImageStream tag changes by adding an `image.openshift.io/triggers` annotation (for example with `oc set triggers`)
 * ImageStreams are namespace scoped, but you can reference them from other namespaces as long as the service account has the right permissions
-** `oc policy add-role-to-user system:image-puller system:serviceaccount:test:default --namespace=default` +
-would give the default service account in the test namespace access to the ImageStreams in the default namespace 
+** This command would give the default service account in the test namespace access to the ImageStreams in the default namespace:
++
+[source,sh,role=execute]
+----
+oc policy add-role-to-user system:image-puller \
+  system:serviceaccount:test:default \
+  --namespace=default
+----
 ====
 
 == Image Pruning
@@ -168,7 +174,10 @@ Here’s an example command:
 
 [source,sh,role=execute]
 ----
-oc adm prune images --keep-tag-revisions=3 --keep-younger-than=60m --confirm
+oc adm prune images \
+  --keep-tag-revisions=3 \
+  --keep-younger-than=60m \
+  --confirm
 ----
 
 This tells OpenShift to:
@@ -186,7 +195,9 @@ Without the `--confirm` flag, the command runs in dry-run mode and only previews
 
 [source,sh,role=execute]
 ----
-oc adm prune images --keep-tag-revisions=3 --keep-younger-than=60m
+oc adm prune images \
+  --keep-tag-revisions=3 \
+  --keep-younger-than=60m
 ----
 
 This is especially useful in production clusters where caution is critical.

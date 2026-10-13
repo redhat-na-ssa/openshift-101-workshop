@@ -59,7 +59,9 @@ In many situations (particularly in cloud based environments) these four are suf
 .Notice the output here:
 [source,sh,role=execute]
 ----
-oc exec deployment/router-default -n openshift-ingress -- sh -c "ps -ef"
+oc exec deployment/router-default \
+  -n openshift-ingress -- \
+  sh -c "ps -ef"
 ----
 
 === Path-Based Routing
@@ -161,7 +163,9 @@ metadata:
 [source,sh,role=execute]
 ----
 # To add an annotation
-oc annotate route "ROUTE_NAME" -n "NAMESPACE" "ANNOTATION_KEY"="ANNOTATION_VALUE"
+oc annotate route "ROUTE_NAME" \
+  -n "NAMESPACE" \
+  "ANNOTATION_KEY"="ANNOTATION_VALUE"
 # To remove an annotation
 oc annotate route "ROUTE_NAME" -n "NAMESPACE" "ANNOTATION_KEY"-
 ----
@@ -204,8 +208,19 @@ Additional annotations for `Route` definition are available with this method::
 [%collapsible]
 ====
 .Yes! Two separate ways in fact:
-* Insecure Routes: `oc expose service "SERVICE_NAME"`
-* Secure Routes: `oc create route (edge|passthrough|reencrypt) --service "SERVICE_NAME" ...`
+* Insecure Routes:
++
+[source,sh,role=execute]
+----
+oc expose service "SERVICE_NAME"
+----
+* Secure Routes:
++
+[source,sh,role=execute]
+----
+oc create route (edge|passthrough|reencrypt) \
+  --service "SERVICE_NAME" ...
+----
 ====
 
 *What happens when you delete a `Route` that has been created from an `Ingress` resource?*

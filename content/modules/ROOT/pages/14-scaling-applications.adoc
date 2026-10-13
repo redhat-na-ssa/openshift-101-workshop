@@ -35,7 +35,12 @@ oc adm top nodes
 
 To focus on a specific workload, you can:
 
-* Use `oc adm top pod POD_NAME --namespace=my-app` to check metrics for a specific pod.
+* Check metrics for a specific pod with:
++
+[source,sh,role=execute]
+----
+oc adm top pod POD_NAME --namespace=my-app
+----
 * Navigate to your project in the **OpenShift web console**, select **Workloads → Deployments**, and click your deployment. From there, the **Metrics** tab will show real-time CPU and memory usage for your application.
 
 [NOTE]
@@ -256,8 +261,15 @@ metadata:
     kubernetes.io/service-account.name: autoscaler
 EOF
 
-oc create role thanos-metrics-reader -n default --verb=get,list,watch --resource=pods,pods.metrics.k8s.io
-oc create rolebinding thanos-metrics-reader -n default --role=thanos-metrics-reader --serviceaccount=default:autoscaler
+oc create role thanos-metrics-reader \
+  -n default \
+  --verb=get,list,watch \
+  --resource=pods,pods.metrics.k8s.io
+
+oc create rolebinding thanos-metrics-reader \
+  -n default \
+  --role=thanos-metrics-reader \
+  --serviceaccount=default:autoscaler
 ----
 
 Then configure a ScaledObject resource that uses the Prometheus trigger:

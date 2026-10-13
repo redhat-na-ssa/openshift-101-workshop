@@ -89,7 +89,12 @@ Start with what you know:
 * Is the pod stuck in a particular state?
 * Are users reporting specific errors or timeouts?
 
-Use `oc get pods` to quickly scan for anomalies in pod status.
+Quickly scan for anomalies in pod status with:
+
+[source,sh,role=execute]
+----
+oc get pods
+----
 
 === 2. Gather Context
 
@@ -242,7 +247,9 @@ To add one, use `kubectl` (it is included in the OpenShift client archive from m
 
 [source,sh,role=execute]
 ----
-kubectl debug -it pod/POD_NAME --image=registry.access.redhat.com/ubi9/ubi --target=CONTAINER_NAME
+kubectl debug -it pod/POD_NAME \
+  --image=registry.access.redhat.com/ubi9/ubi \
+  --target=CONTAINER_NAME
 ----
 
 This attaches a troubleshooting container based on the image you choose (`--image` is required) to the running pod. `--target` shares the process namespace of a specific container, so you can see its processes.
@@ -414,7 +421,8 @@ You can also inspect the SCC (Security Context Constraint) that admitted the pod
 
 [source,sh,role=execute]
 ----
-oc get pod POD_NAME -o yaml | grep -i -e "openshift.io/scc" -e "securityContext" -A3
+oc get pod POD_NAME -o yaml |
+  grep -i -e "openshift.io/scc" -e "securityContext" -A3
 ----
 
 ==== 5. Look at the StorageClass

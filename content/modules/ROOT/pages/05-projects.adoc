@@ -56,7 +56,8 @@ oc extract secret/"SECRET_NAME" --to=- --keys=token
 [source,sh,role=execute]
 ----
 REM Run this in the project that contains the service account
-echo {"apiVersion":"v1","kind":"Secret","metadata":{"name":"SECRET_NAME","annotations":{"kubernetes.io/service-account.name":"SERVICE_ACCOUNT_NAME"}},"type":"kubernetes.io/service-account-token"} | oc apply -f -
+echo {"apiVersion":"v1","kind":"Secret","metadata":{"name":"SECRET_NAME","annotations":{"kubernetes.io/service-account.name":"SERVICE_ACCOUNT_NAME"}},"type":"kubernetes.io/service-account-token"} | ^
+  oc apply -f -
 oc extract secret/"SECRET_NAME" --to=- --keys=token
 ----
 
@@ -239,7 +240,12 @@ This would force all pods in this namespace to fall between .250 by 256Mi and .7
 [%collapsible]
 ====
 Since all workloads leverage a service account, you can find the token using your Linux filesystem skills. + 
-`oc exec -it "POD_NAME" -- sh` will get you into a pod's context.
+This command will get you into a pod's context:
+
+[source,sh,role=execute]
+----
+oc exec -it "POD_NAME" -- sh
+----
 ====
 
 *How long do service account tokens created with `oc create token` last?*
