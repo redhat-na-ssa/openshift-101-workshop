@@ -1,0 +1,10 @@
+/* keep commands on one line and scroll sideways instead of wrapping mid-flag */
+.doc .listingblock pre,
+.doc .tableblock pre {
+    white-space: pre;
+    overflow-x: auto;
+}
+/* let a code block inside a table scroll instead of widening the table past the screen */
+.doc table.tableblock:has(.listingblock) {
+    table-layout: fixed;
+}
