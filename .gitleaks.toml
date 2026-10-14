@@ -1,0 +1,46 @@
+# Gitleaks configuration for this workshop.
+#
+# Keeps every built-in gitleaks rule and adds a rule for hard-coded
+# passwords. Workshop content contains a few placeholder passwords and demo
+# tokens on purpose; each one is allowlisted below by its exact value (or,
+# for old history, by commit), so any other password or token still fails
+# the scan.
+#
+# Run locally:
+#   gitleaks git --config .gitleaks.toml .
+#   gitleaks dir --config .gitleaks.toml .
+
+title = "Workshop gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "hardcoded-password"
+description = "Password written as a literal value in YAML, a shell variable or a CLI flag"
+regex = '''(?i)(?:--[\w-]*(?:passw(?:or)?d|passwd)(?:=|[ \t]+)|\b[\w.-]*(?:passw(?:or)?d|passwd|sshpass)[\w.-]*["']?[ \t]*[:=][ \t]*)["']?([^\s"'`$\\{}()<>|#,;\[\]]{3,})'''
+secretGroup = 1
+keywords = ["pass"]
+
+[[rules.allowlists]]
+description = "Placeholder passwords used in the workshop content"
+regexTarget = "secret"
+regexes = [
+  # bastion_password placeholder in the Showroom Helm values
+  '''^from_helm$''',
+  # literal "password" placeholder (Helm values and Secret examples)
+  '''^password$''',
+  # base64 of "password" in a Secret example
+  '''^cGFzc3dvcmQ=$''',
+  # docker-registry pull secret example
+  '''^mypassword$''',
+]
+
+# Commit c324c34 added a kubeconfig example for a local CodeReady Containers
+# cluster (api.crc.testing) with two OAuth tokens. They were redacted in
+# e86bce9; the tokens belonged to a throwaway local cluster and have expired.
+[[rules]]
+id = "openshift-user-token"
+[[rules.allowlists]]
+description = "Expired CRC tokens in an old kubeconfig example"
+commits = ["c324c34e5264b869e191aa25a77e63f21e10a62c"]
