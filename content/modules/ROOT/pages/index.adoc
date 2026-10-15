@@ -24,6 +24,10 @@ These tools ensure a smooth and flexible experience, allowing you to interact wi
 
 === Agenda
 
+.**Day 0** (optional, for newcomers)
+* **Container & OpenShift Fundamentals**: +
+A one-day introduction for infrastructure and VMware administrators with no container background: containers, Kubernetes building blocks, what OpenShift adds, configuration, storage, networking and troubleshooting. See the xref:d0-00-agenda.adoc[Day Zero agenda].
+
 .**Day 1**
 * **Background**: +
 Why you might use OpenShift for application development.
@@ -57,6 +61,10 @@ Workloads beyond basic deployments
 === Who Should Attend
 
 This workshop is designed for developers, DevOps engineers, and IT professionals who are either getting started with OpenShift or looking to enhance their application development skills on the platform.
+
+Day Zero is designed for infrastructure and VMware administrators who are new to containers, Kubernetes and OpenShift. It can run on its own, or as preparation for Days One and Two.
+
+Everything the instructor needs to prepare is in xref:setup-requirements.adoc[Setup Requirements].
 
 === Conclusion
 

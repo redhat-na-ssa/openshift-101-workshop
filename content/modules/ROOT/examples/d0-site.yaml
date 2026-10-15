@@ -1,0 +1,53 @@
+# A web server whose only page comes from the site-content ConfigMap.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: site
+  labels:
+    app: site
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: site
+  template:
+    metadata:
+      labels:
+        app: site
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: site
+        image: registry.access.redhat.com/ubi9/httpd-24:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        # Every key in the ConfigMap appears as a file in this directory.
+        - name: content
+          mountPath: /var/www/html
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: content
+        configMap:
+          name: site-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: site
+  labels:
+    app: site
+spec:
+  selector:
+    app: site
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080

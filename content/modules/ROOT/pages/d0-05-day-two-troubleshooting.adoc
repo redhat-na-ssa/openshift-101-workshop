@@ -1,0 +1,360 @@
+= Module 5: Day-2 Basics and Troubleshooting
+
+[NOTE]
+====
+*Validation status:* the steps on this page have not yet been checked on a live OpenShift 4.22 cluster.
+The images they use were checked to start and run as a non-root user in October 2026.
+====
+
+*Time:* 40 minutes
+
+"Day 2" means everything after installation: keeping the platform healthy and helping the people whose applications run on it.
+This module shows the cluster from an administrator's side, then works through the four failures you will be asked about most often.
+
+.In this module
+* <<admin-view>>
+* <<oc-kubectl>>
+* <<method>>
+* <<pod-states>>
+* <<demo>>
+* <<next-steps>>
+* <<recap>>
+
+[#admin-view]
+== The Cluster from an Administrator's Side
+
+Nodes::
+Each node reports its status (`Ready` or not), its capacity, and how much of it pods have already requested.
+When a node is `NotReady`, its pods are eventually recreated elsewhere.
+
+Cluster Operators::
+As Module 3 showed, every part of the platform reports its own health.
+A degraded Operator usually names the problem in its status message.
+
+Maintenance::
+Before working on a node, you *cordon* it so that no new pods are scheduled there, then *drain* it so that its pods are evicted and recreated on other nodes.
+When the work is done, you *uncordon* it.
+Remember that nothing is live-migrated: draining replaces pods, so applications should run more than one replica.
+
+Upgrades::
+OpenShift upgrades are requested from the console or with `oc adm upgrade`.
+The cluster then updates its control plane, its Operators and finally its nodes, one node at a time, through the Machine Config Operator.
+Planning upgrades is a Day One and Day Two topic; on Day Zero it's enough to know that the cluster does the rolling for you.
+
+[#oc-kubectl]
+== `oc` and `kubectl`
+
+Both tools talk to the same Kubernetes API, and `oc` includes every `kubectl` command, so `oc get pods` and `kubectl get pods` do the same thing.
+`oc` adds commands for what OpenShift adds:
+
+[cols="1,2",options="header"]
+|===
+|`oc` command |What it does
+
+|`oc login`
+|Signs in to a cluster with your OpenShift credentials
+
+|`oc new-project`, `oc project`
+|Creates a project, or switches to one
+
+|`oc new-app`, `oc start-build`
+|Builds and deploys from source code or an image
+
+|`oc expose`
+|Creates a Route for a Service
+
+|`oc rsh`
+|Opens a shell in a running container
+
+|`oc debug`
+|Starts a copy of a pod, or a pod on a node, for investigation
+
+|`oc adm`
+|Administrator commands: node maintenance, upgrades, policy, must-gather
+|===
+
+Instructions written for `kubectl` work with `oc` unchanged.
+
+[#method]
+== A Method for "My App Won't Start"
+
+Work from the outside in:
+
+. *Get* the status: `oc get pods` shows each pod's state and restart count.
+. *Describe* the object: `oc describe pod NAME` ends with *Events*, the cluster's own account of what went wrong (scheduling, image pulls, mounts, restarts).
+. *Read the logs*: `oc logs NAME` for the current container, `oc logs --previous NAME` for the one that just crashed.
+. *Look inside*: `oc rsh NAME` or `oc exec NAME -- COMMAND` in a running container, or `oc debug` to start a copy of a crashing one with a shell instead of its normal command.
+
+When there is no pod at all, describe the object one level up: the ReplicaSet or Deployment that should have created it.
+
+The console shows the same information: a pod's *Details*, *Events* and *Logs* tabs, and a *Terminal* tab for a shell.
+
+[#pod-states]
+== Common Pod States
+
+[cols="1,3",options="header"]
+|===
+|State |What it usually means
+
+|`Pending`
+|The pod has no node yet: no node has enough free CPU or memory for its requests, or its storage isn't ready.
+
+|`ContainerCreating`
+|The pod has a node and is pulling its image or mounting its volumes. If it stays here, check the events.
+
+|`ImagePullBackOff`, `ErrImagePull`
+|The image couldn't be pulled: a wrong name or tag, a private registry without credentials, or no route to the registry.
+
+|`CrashLoopBackOff`
+|The container starts and then exits, again and again, and Kubernetes waits longer between each retry. The previous container's log usually says why.
+
+|`OOMKilled` (shown as the reason for the last exit)
+|The container used more memory than its limit and the kernel stopped it.
+
+|`Completed`
+|The container finished its work and exited successfully. Normal for jobs; a problem for a web server.
+|===
+
+[#demo]
+== Demo: Four Broken Applications
+
+Everyone can follow this demo in their own project.
+
+=== The admin's view (cluster read access)
+
+List the nodes, with their status, roles and version:
+
+[source,sh,role=execute]
+----
+oc get nodes
+----
+
+See how much CPU and memory each node is using right now:
+
+[source,sh,role=execute]
+----
+oc adm top nodes
+----
+
+Show one node's capacity, what pods have requested on it, and its recent events, replacing `NODE_NAME` with a worker from the list:
+
+[source,sh,role=execute]
+----
+oc describe node NODE_NAME
+----
+
+Show the cluster version and any available updates:
+
+[source,sh,role=execute]
+----
+oc adm upgrade
+----
+
+*Instructor only:* mark a worker as unschedulable, then return it to service.
+On a cluster with spare capacity, the instructor also drains it and shows the pods being recreated elsewhere:
+
+[source,sh,role=execute]
+----
+oc adm cordon NODE_NAME
+----
+
+[source,sh,role=execute]
+----
+oc adm drain NODE_NAME \
+  --ignore-daemonsets \
+  --delete-emptydir-data
+----
+
+[source,sh,role=execute]
+----
+oc adm uncordon NODE_NAME
+----
+
+=== Deploy the broken applications
+
+This file holds four small Deployments, each broken in a different way.
+Don't read it yet: diagnose them from what the cluster tells you.
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-broken-apps.yaml
+----
+
+OpenShift prints a warning about `broken-root` as it accepts the file.
+Keep it in mind.
+
+None of the four becomes ready:
+
+[source,sh,role=execute]
+----
+oc get deployments \
+  --selector 'app in (broken-image,broken-crash,broken-pending,broken-root)'
+----
+
+Only three of them have pods:
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector 'app in (broken-image,broken-crash,broken-pending,broken-root)'
+----
+
+=== broken-image
+
+The pod shows `ErrImagePull` or `ImagePullBackOff`.
+Its events name the image and the reason:
+
+[source,sh,role=execute]
+----
+oc describe pod \
+  --selector app=broken-image
+----
+
+The tag doesn't exist.
+The fix is the correct image name or tag, or pull credentials if the registry is private.
+
+=== broken-crash
+
+The pod shows `CrashLoopBackOff` and a rising restart count.
+Read the log of the container that just exited:
+
+[source,sh,role=execute]
+----
+oc logs deployment/broken-crash \
+  --previous
+----
+
+The application says what it is missing.
+To look around inside a crashing container, start a copy of it with a shell instead of its normal command:
+
+[source,sh,role=execute]
+----
+oc debug deployment/broken-crash
+----
+
+Inside the debug shell, check the environment, then leave with `exit`:
+
+[source,sh,role=execute]
+----
+env | grep DATABASE
+----
+
+The variable isn't set.
+The fix belongs in the Deployment, for example from a ConfigMap or Secret as in Module 4.
+
+=== broken-pending
+
+The pod shows `Pending`.
+Its events come from the scheduler:
+
+[source,sh,role=execute]
+----
+oc describe pod \
+  --selector app=broken-pending
+----
+
+Look for `FailedScheduling` and `Insufficient cpu`: the pod requests 500 CPU cores, more than any node has.
+The fix is a realistic request, or more capacity.
+
+=== broken-root
+
+There is no pod to describe, so go one level up, to the ReplicaSet that should have created it:
+
+[source,sh,role=execute]
+----
+oc describe replicaset \
+  --selector app=broken-root
+----
+
+Its events say `FailedCreate` and `unable to validate against any security context constraint`: the pod asks to run as user 0, and the SCCs available to it don't allow root.
+The fix is an image and settings that don't need root, as in Module 3.
+
+=== Open a shell in a healthy container
+
+For comparison, open a shell in the running `toolbox` pod, look at its processes, then leave with `exit`:
+
+[source,sh,role=execute]
+----
+oc rsh toolbox
+----
+
+[source,sh,role=execute]
+----
+ps -ef
+----
+
+=== Clean up
+
+Delete the broken applications:
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc delete \
+  --filename {d0-examples}/d0-broken-apps.yaml
+----
+
+To remove everything Day Zero created in your project, including the database's volume:
+
+[source,sh,role=execute]
+----
+oc delete deployment,service,route,buildconfig,imagestream,pvc \
+  --selector 'app in (web,site,db,hello-s2i)'
+----
+
+[source,sh,role=execute]
+----
+oc delete configmap site-content
+----
+
+[source,sh,role=execute]
+----
+oc delete secret db-credentials
+----
+
+[source,sh,role=execute]
+----
+oc delete pod toolbox
+----
+
+[#next-steps]
+== Where to Keep Learning
+
+* xref:00-day-one-agenda.adoc[Day One] of this workshop: deploying and exposing applications on OpenShift in depth.
+* https://developers.redhat.com/developer-sandbox[Red Hat Developer Sandbox]: a free OpenShift project to keep practising in.
+* https://www.redhat.com/en/interactive-labs/openshift[Red Hat interactive labs for OpenShift]: short guided exercises in the browser.
+* The other workshops on this site, once you're comfortable: https://deploy.workshop.k8socp.com[pod scheduling], https://helm.workshop.k8socp.com[Helm], https://prometheus.workshop.k8socp.com[Prometheus queries], https://istio.workshop.k8socp.com[service mesh] and https://cloud.workshop.k8socp.com[OpenShift on AWS and Azure].
+
+[#recap]
+== What Changes for You
+
+* Health checks start with `oc get nodes` and `oc get clusteroperators`.
+* Maintenance means cordon, drain, uncordon. Draining replaces pods, so single-replica applications go down briefly.
+* Troubleshooting follows the same steps every time: get, describe (events), logs, then look inside.
+* `oc` is `kubectl` plus OpenShift's extras. Anything written for `kubectl` works with `oc`.
+
+== Knowledge Check
+
+*A pod is `Pending` for ten minutes. Where do you look?*
+
+.Answer
+[%collapsible]
+====
+At its events, with `oc describe pod`. A `FailedScheduling` event says which requirement no node could meet.
+====
+
+*A Deployment shows 0 of 1 ready, and there is no pod at all. What next?*
+
+.Answer
+[%collapsible]
+====
+Describe its ReplicaSet. Pods that are rejected when they're created, for example by an SCC, leave a `FailedCreate` event there.
+====
+
+*How do you read the log of a container that already crashed and restarted?*
+
+.Answer
+[%collapsible]
+====
+`oc logs --previous`, which shows the log of the container before the last restart.
+====

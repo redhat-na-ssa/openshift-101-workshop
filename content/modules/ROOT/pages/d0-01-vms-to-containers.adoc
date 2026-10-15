@@ -1,0 +1,380 @@
+= Module 1: From Virtual Machines to Containers
+
+[NOTE]
+====
+*Validation status:* the Podman steps and image details on this page were checked on a Linux host in October 2026.
+Steps that run on OpenShift have not yet been checked on a live OpenShift 4.22 cluster.
+====
+
+*Time:* 60 minutes
+
+You already know how a hypervisor shares a physical server between virtual machines.
+This module shows how containers share a server in a different way, and why that difference shapes everything that follows today.
+
+.In this module
+* <<two-ways>>
+* <<why-containers>>
+* <<just-a-process>>
+* <<images>>
+* <<demo>>
+* <<recap>>
+
+[#two-ways]
+== Two Ways to Share a Server
+
+A hypervisor gives each virtual machine its own virtual hardware, and each VM boots its own operating system with its own kernel.
+
+A container runtime does something smaller.
+There is one operating system and one kernel, and each container is a group of ordinary processes that the kernel keeps apart from everything else.
+There is no virtual hardware and nothing to boot.
+
+image::virtualization-vs-containers_transparent.png[Virtual machines each run a guest operating system on a hypervisor, while containers share the host's kernel]
+
+[cols="1,2,2",options="header"]
+|===
+| |Virtual machine |Container
+
+|What's inside
+|A full operating system, its kernel, and the applications
+|One application, the libraries it needs, and its files
+
+|Kernel
+|Its own
+|Shared with every other container on the host
+
+|Start time
+|As long as the guest OS takes to boot
+|About as long as the application takes to start
+
+|Isolation boundary
+|Virtual hardware, enforced by the hypervisor
+|Kernel features, enforced by the host's kernel
+
+|How you update it
+|Patch it in place
+|Build a new image and replace the container
+|===
+
+Because the kernel is shared, a container image built for Linux on x86 runs on any Linux x86 host, but not on Windows and not on an Arm server without an Arm build of the image.
+
+[#why-containers]
+== Why Platforms Moved to Containers
+
+Density::
+No guest operating system per application, so one server can run many more applications.
+
+Start time::
+A container starts as fast as its application does, so replacing one takes seconds.
+
+Immutability::
+An image doesn't change after it is built.
+The same image runs in test and in production, so "it worked in test" means something.
+
+Portability::
+An image carries its own libraries, so it runs the same way on a laptop, in a data center, or in a public cloud.
+
+[#just-a-process]
+== A Container Is Just an Isolated Process
+
+Containers are made from two features of the Linux kernel.
+
+*Namespaces* control what a process can _see_.
+Each container gets its own view of:
+
+* processes (`pid`): it sees only its own processes, and its main process is number 1
+* network (`net`): its own network interfaces, addresses and ports
+* files (`mnt`): its own root file system, which comes from the image
+* host name (`uts`): its own host name
+* and a few more (`ipc`, `user`, `cgroup`)
+
+*Control groups (cgroups)* control what a process can _use_: how much CPU time, how much memory, how many processes.
+A container that tries to use more memory than its limit is stopped by the kernel.
+
+From the host's point of view, the container's processes are ordinary processes in the host's process list.
+That's why "a small VM" is the wrong picture: there is no second computer inside, only processes with a restricted view.
+
+[#images]
+== Images, Layers and Registries
+
+An *image* is a stack of read-only *layers*.
+Each layer records the files that one build step added or changed, for example a base operating system layer, then a layer that installs a web server, then a layer that adds the application.
+Images that share a base layer share it on disk too, so it is downloaded once.
+
+When a container starts, the runtime adds one thin writable layer on top.
+Anything the container writes goes into that layer, and a file from the image is copied up into it the first time the container changes it (*copy-on-write*).
+When the container is removed, its writable layer goes with it.
+That's why you don't patch a running container: you build a new image and replace the container.
+
+A *registry* stores images and serves them to every host that needs them.
+Public examples are https://quay.io[Quay.io], https://hub.docker.com[Docker Hub] and Red Hat's `registry.access.redhat.com`.
+OpenShift also includes a registry inside the cluster.
+
+An image name such as `registry.access.redhat.com/ubi9/httpd-24:latest` has three parts:
+
+* `registry.access.redhat.com` is the registry
+* `ubi9/httpd-24` is the repository, a collection of versions of one image
+* `latest` is the tag, which picks one version
+
+A *tag* is a label, and someone can move it to a newer image at any time.
+A *digest* (`sha256:...`) is computed from the image's contents, so it always means exactly the same image.
+Production systems often pin images by digest for that reason.
+
+[#demo]
+== Demo: Run a Container and Look Inside It
+
+=== Part 1: A container on a Linux host (Instructor only)
+
+The instructor runs this part on a Linux machine with Podman installed, such as RHEL 9 or Fedora.
+
+Start a web server container, limited to 128 MiB of memory:
+
+[source,sh,role=execute]
+----
+podman run \
+  --detach \
+  --name web \
+  --memory 128m \
+  --publish 8080:8080 \
+  registry.access.redhat.com/ubi9/httpd-24
+----
+
+List the processes inside the container.
+The web server is process number 1, and nothing from the host is visible:
+
+[source,sh,role=execute]
+----
+podman exec web ps -ef
+----
+
+Find the same web server from the host.
+First get its process ID as the host sees it:
+
+[source,sh,role=execute]
+----
+podman inspect \
+  --format '{{.State.Pid}}' \
+  web
+----
+
+Then look that process up in the host's own process list, replacing `PID` with the number from the previous command.
+It is an ordinary process with a different number:
+
+[source,sh,role=execute]
+----
+ps -o user,pid,cmd -p PID
+----
+
+List the namespaces that process belongs to:
+
+[source,sh,role=execute]
+----
+lsns --task PID
+----
+
+Read the memory limit the kernel enforces for the container, which is 128 MiB in bytes:
+
+[source,sh,role=execute]
+----
+podman exec web cat /sys/fs/cgroup/memory.max
+----
+
+NOTE: That path is for hosts that use cgroups version 2, the default on RHEL 9 and Fedora.
+On a host with cgroups version 1, read `/sys/fs/cgroup/memory/memory.limit_in_bytes` instead.
+
+Compare the kernel version on the host and inside the container.
+They match, because there is only one kernel:
+
+[source,sh,role=execute]
+----
+uname -r
+----
+
+[source,sh,role=execute]
+----
+podman exec web uname -r
+----
+
+Now change the running container.
+Write a home page into it:
+
+[source,sh,role=execute]
+----
+podman exec web \
+  sh -c 'echo "Hello from a container" > /var/www/html/index.html'
+----
+
+[source,sh,role=execute]
+----
+curl http://localhost:8080
+----
+
+List the files that now differ from the image.
+`A` means added and `C` means changed; they all live in the container's writable layer:
+
+[source,sh,role=execute]
+----
+podman diff web
+----
+
+Remove the container and start a new one from the same image:
+
+[source,sh,role=execute]
+----
+podman rm --force web
+----
+
+[source,sh,role=execute]
+----
+podman run \
+  --detach \
+  --name web \
+  --publish 8080:8080 \
+  registry.access.redhat.com/ubi9/httpd-24
+----
+
+The home page is gone, and the server answers `403 Forbidden` because it has no page to serve.
+The change lived only in the old container's writable layer:
+
+[source,sh,role=execute]
+----
+curl \
+  --silent \
+  --output /dev/null \
+  --write-out '%{http_code}\n' \
+  http://localhost:8080
+----
+
+Show the image's read-only layers:
+
+[source,sh,role=execute]
+----
+podman image tree registry.access.redhat.com/ubi9/httpd-24
+----
+
+Clean up:
+
+[source,sh,role=execute]
+----
+podman rm --force web
+----
+
+=== Part 2: A container on OpenShift (Everyone)
+
+You can follow this part with `oc`, after logging in as described in xref:d0-00-agenda.adoc[the Day Zero agenda].
+
+Look at the same image's layers straight from the registry, without downloading it:
+
+[source,sh,role=execute]
+----
+oc image info \
+  registry.access.redhat.com/ubi9/httpd-24:latest \
+  --filter-by-os linux/amd64
+----
+
+The output lists each layer with its size, and the `Digest` line is the image's permanent identity.
+Run it again in a few weeks and the digest for `latest` will probably have changed, because the tag will point at a rebuilt image.
+
+Start a pod from that image with a CPU limit of a quarter of a core and a memory limit of 128 MiB.
+This is the file you are about to apply:
+
+.d0-toolbox-pod.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-toolbox-pod.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-toolbox-pod.yaml
+----
+
+Wait for it to be ready:
+
+[source,sh,role=execute]
+----
+oc wait pod/toolbox \
+  --for=condition=Ready \
+  --timeout=120s
+----
+
+List the processes inside it.
+As on the Linux host, the web server is process number 1:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- ps -ef
+----
+
+Its host name is the pod's name, from its own `uts` namespace:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- hostname
+----
+
+Read the memory limit, which is 128 MiB in bytes:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- cat /sys/fs/cgroup/memory.max
+----
+
+Read the CPU limit.
+`25000 100000` means the container may use 25,000 microseconds of CPU time in every 100,000, a quarter of one core:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- cat /sys/fs/cgroup/cpu.max
+----
+
+Check which user the container runs as:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- id
+----
+
+The user ID is a large number that nobody chose, and it is not root.
+OpenShift picked it for your project; Module 3 explains why.
+
+Leave the `toolbox` pod running.
+Modules 2 and 4 use it to test connections from inside the cluster.
+
+[#recap]
+== What Changes for You
+
+* A container is a set of processes on a shared kernel, not a machine. Limits are kernel settings, not virtual hardware.
+* You don't patch or log in to fix a container. You build a new image and replace the container.
+* Anything a container writes outside a volume disappears with it. Module 4 covers storage that lasts.
+* Images live in registries and are identified by digest. Tags are convenient but can move.
+
+== Knowledge Check
+
+*A host runs 20 containers. How many kernels are running?*
+
+.Answer
+[%collapsible]
+====
+One. Every container on a host shares the host's kernel.
+====
+
+*You fix a configuration file inside a running container, and the next day the fix is gone. What happened?*
+
+.Answer
+[%collapsible]
+====
+The container was replaced, and the fix lived only in the old container's writable layer.
+The fix belongs in the image, or in configuration supplied from outside the container (Module 4).
+====
+
+*Why might two people who pull `ubi9/httpd-24:latest` a month apart get different images?*
+
+.Answer
+[%collapsible]
+====
+A tag is a movable label. The publisher pointed `latest` at a newer build. Pulling by digest always returns the same image.
+====
