@@ -1,0 +1,97 @@
+= Day Zero Agenda: Container & OpenShift Fundamentals
+
+Day Zero is a one-day introduction for infrastructure and VMware administrators who have never worked with containers, Kubernetes or OpenShift.
+It is built for a virtual classroom: short talks, live demos, and Q&A at the end of every module.
+No coding is required, and nobody is expected to memorize YAML.
+
+Days One and Two of this workshop go deeper and assume what Day Zero teaches.
+
+== Schedule
+
+[cols="1,3",options="header"]
+|===
+|Time |Session
+
+|9:00 to 9:10 AM
+|Welcome, and the xref:d0-concept-map.adoc[concept map] that ties the day together
+
+|9:10 to 10:10 AM
+|xref:d0-01-vms-to-containers.adoc[Module 1: From Virtual Machines to Containers]
+
+|10:10 to 10:20 AM
+|Break
+
+|10:20 to 11:20 AM
+|xref:d0-02-kubernetes-building-blocks.adoc[Module 2: Kubernetes Building Blocks]
+
+|11:20 AM to 12:05 PM
+|Lunch
+
+|12:05 to 1:15 PM
+|xref:d0-03-what-openshift-adds.adoc[Module 3: What OpenShift Adds]
+
+|1:15 to 2:10 PM
+|xref:d0-04-config-storage-networking.adoc[Module 4: Configuration, Storage and Networking]
+
+|2:10 to 2:20 PM
+|Break
+
+|2:20 to 3:00 PM
+|xref:d0-05-day-two-troubleshooting.adoc[Module 5: Day-2 Basics and Troubleshooting]
+|===
+
+== Outcomes
+
+By the end of Day Zero, participants can:
+
+* Explain what a container is at the operating system level, and why it is not a small virtual machine.
+* Describe the core Kubernetes objects (Pods, Deployments, Services, Namespaces) and how they keep an application running.
+* Say what OpenShift adds to Kubernetes, and find their way around the OpenShift web console.
+* Explain how applications get their settings, storage and network access.
+* Work through the first troubleshooting steps for an application that won't start.
+
+== How the demos work
+
+The instructor runs every demo live.
+If you have access to the workshop cluster, you can run the same steps in your own project as the instructor goes.
+Steps marked *Instructor only* need administrator rights or a Linux machine, so just watch those.
+
+Everything you need to follow along is in xref:setup-requirements.adoc[Setup Requirements].
+The short version: a web browser, and either the `oc` command-line tool on your computer or the web terminal in the OpenShift console.
+
+=== Log in from the command line
+
+In the OpenShift web console, open the menu under your user name in the top right and choose *Copy login command*.
+Log in again if you are asked, then select *Display Token*.
+Copy the command shown under *Log in with this token* and run it in your terminal.
+It looks like this:
+
+[source,sh,role=execute]
+----
+oc login \
+  --token=sha256~REPLACE_WITH_YOUR_TOKEN \
+  --server=https://api.REPLACE_WITH_CLUSTER_DOMAIN:6443
+----
+
+Confirm who you are logged in as:
+
+[source,sh,role=execute]
+----
+oc whoami
+----
+
+Confirm which project your commands will run in:
+
+[source,sh,role=execute]
+----
+oc project
+----
+
+Every demo command runs in your current project, so check that it names your own project before you start.
+
+=== The example files
+
+The demos create objects from small YAML files.
+Each page shows the file it uses, and the commands read the same files straight from the workshop's repository, so there is nothing to download.
+
+xref:d0-01-vms-to-containers.adoc[Start Module 1]

@@ -1,0 +1,339 @@
+= Module 2: Kubernetes Building Blocks
+
+[NOTE]
+====
+*Validation status:* every step on this page was run on a single-node OpenShift 4.21 cluster on 15 October 2026.
+It has not yet been run on 4.22.
+====
+
+*Time:* 60 minutes
+
+One container on one host is easy to run by hand.
+Hundreds of containers across dozens of hosts, restarted when they crash, spread across hosts, and reachable at a stable address, are not.
+That job is called orchestration, and Kubernetes is the orchestrator inside OpenShift.
+
+.In this module
+* <<desired-state>>
+* <<objects>>
+* <<labels>>
+* <<scheduling>>
+* <<declarative>>
+* <<demo>>
+* <<recap>>
+
+[#desired-state]
+== Desired State: the One Idea to Remember
+
+You don't tell Kubernetes what to _do_.
+You tell it what you _want_, for example "three copies of this web server, always", and it works continuously to make the cluster match.
+
+Controllers inside Kubernetes run a loop: compare what you asked for with what exists, then act on the difference.
+If a container crashes, a node fails, or someone deletes a pod by mistake, the next pass of the loop notices one copy is missing and creates a new one.
+
+That loop is where Kubernetes gets its self-healing, scaling and rolling updates.
+
+[#objects]
+== The Core Objects
+
+Pod::
+The smallest thing Kubernetes runs: one or more containers that are always placed together on the same node and share a network address.
+Most pods hold one container.
+Kubernetes uses pods rather than bare containers so that a helper container (a log shipper, a proxy) can share an address and files with the main one.
+Pods are disposable: when one fails, it is replaced, not repaired.
+
+Deployment::
+Describes the pods you want: which image, how many copies (_replicas_), and how to roll out a new version.
+You almost never create pods directly; you create a Deployment and it creates the pods.
+
+ReplicaSet::
+Created by the Deployment, one per version of your pod template.
+It keeps the right number of pods running for that version.
+During a rollout, the Deployment scales the new ReplicaSet up and the old one down, and a rollback simply scales an old one back up.
+
+Service::
+A stable name and address in front of a changing set of pods.
+Pods come and go and their addresses change; the Service's address doesn't.
+It spreads connections across the pods behind it, and other pods find it by name through the cluster's DNS.
+
+Namespace::
+A named area of the cluster that holds a team's or an application's objects.
+Names only need to be unique within a namespace, and access rights and quotas are usually set per namespace.
+OpenShift calls a namespace a _project_ (Module 3).
+
+To expose a Service outside the cluster, Kubernetes has the Ingress object, and OpenShift adds Routes.
+Module 3 covers both.
+
+[#labels]
+== Labels and Selectors: How Objects Find Each Other
+
+A *label* is a key and value attached to an object, such as `app: web`.
+A *selector* is a query on labels.
+
+Nothing in Kubernetes is wired together by name.
+A Deployment manages the pods whose labels match its selector, and a Service sends traffic to the pods whose labels match its selector.
+If a pod's labels change, it silently leaves one group and joins another.
+When something "can't find" its pods, labels are the first thing to check.
+
+[#scheduling]
+== Where Pods Run
+
+The *scheduler* picks a node for each new pod, based on the CPU and memory the pod requests and any placement rules.
+Once a pod is running, it stays on that node until it ends.
+
+If a node fails, its pods are not moved.
+The Deployment notices that pods are missing and creates new ones, which the scheduler places on healthy nodes.
+The new pods have new names and new addresses, which is why applications are reached through Services.
+
+[#declarative]
+== Describing What You Want, Not Typing What to Do
+
+There are two ways to change a cluster:
+
+Imperative::
+A command that does one thing now, such as `oc scale deployment/web --replicas=5`.
+Quick, but the change isn't written down anywhere.
+
+Declarative::
+A YAML file that describes the whole object, applied with `oc apply`.
+The file can be reviewed, versioned in Git, and applied again to get the same result.
+
+On Day Zero, the goal is to _read_ YAML, not write it.
+Every manifest has the same four top-level fields:
+
+[source,yaml]
+----
+apiVersion: apps/v1   # which version of the Kubernetes API defines this kind
+kind: Deployment      # what sort of object this is
+metadata:             # its name and labels
+  name: web
+spec:                 # what you want: the desired state
+  replicas: 3
+----
+
+Kubernetes adds a fifth field, `status`, that reports what actually exists.
+The controllers' job is to make `status` match `spec`.
+
+[#demo]
+== Demo: Deploy, Scale, Break and Recover
+
+Everyone can follow this demo in their own project.
+It uses a small web server that replies with the name of the pod that answered, so you can see which copy served each request.
+
+=== Deploy
+
+This Deployment asks for three copies.
+Notice the selector and the labels in the pod template:
+
+.d0-web-deployment.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-web-deployment.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-web-deployment.yaml
+----
+
+See the chain the Deployment created: one Deployment, one ReplicaSet, three pods.
+The ReplicaSet's name is the Deployment's name plus a suffix, and each pod's name adds another:
+
+[source,sh,role=execute]
+----
+oc get deployments,replicasets,pods \
+  --selector app=web
+----
+
+Show each pod's labels and the node it landed on:
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector app=web \
+  --show-labels \
+  --output wide
+----
+
+=== Put a Service in front
+
+.d0-web-service.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-web-service.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-web-service.yaml
+----
+
+The `Endpoints` line lists the addresses of the pods the Service found through its selector:
+
+[source,sh,role=execute]
+----
+oc describe service web
+----
+
+Call the Service by name from the `toolbox` pod you started in Module 1.
+Run this a few times, and different pods answer:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent http://web:8080/hostname
+----
+
+=== Scale
+
+Scale to five copies with an imperative command:
+
+[source,sh,role=execute]
+----
+oc scale deployment/web \
+  --replicas=5
+----
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector app=web
+----
+
+The Service picks up the new pods by their labels, with no change to the Service.
+
+=== Break it and watch it heal
+
+Save the name of one pod:
+
+[source,sh,role=execute]
+----
+POD=$(oc get pods \
+  --selector app=web \
+  --output name | head -n 1)
+----
+
+Delete it:
+
+[source,sh,role=execute]
+----
+oc delete "$POD"
+----
+
+List the pods again.
+There are still five: one is only a few seconds old and has a name you haven't seen before:
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector app=web
+----
+
+Nobody restarted the old pod.
+The ReplicaSet saw four pods where it wanted five and created a new one.
+
+=== Roll out a bad version, then roll back
+
+Change the image to a tag that doesn't exist, as if a release went wrong:
+
+[source,sh,role=execute]
+----
+oc set image deployment/web \
+  web=registry.k8s.io/e2e-test-images/agnhost:9.99-does-not-exist
+----
+
+Watch the rollout.
+It doesn't finish, and the command gives up after 30 seconds:
+
+[source,sh,role=execute]
+----
+oc rollout status deployment/web \
+  --timeout=30s
+----
+
+Look at the pods.
+The new ones can't pull their image, but most of the old ones are still running, because a rolling update only removes old pods as new ones become ready:
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector app=web
+----
+
+The application is still answering:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent http://web:8080/hostname
+----
+
+Roll back to the previous version:
+
+[source,sh,role=execute]
+----
+oc rollout undo deployment/web
+----
+
+[source,sh,role=execute]
+----
+oc rollout status deployment/web
+----
+
+=== Declarative: the file wins
+
+The file you applied at the start still says three replicas and the original image.
+Apply it again:
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-web-deployment.yaml
+----
+
+[source,sh,role=execute]
+----
+oc get deployment web
+----
+
+The Deployment is back to exactly what the file describes.
+That's why teams keep their manifests in Git: the files, not anyone's memory of commands, are the record of what should be running.
+
+[#recap]
+== What Changes for You
+
+* You describe the state you want, and controllers keep working to reach it. You rarely fix things by hand.
+* Pods are replaced, never moved or repaired. Plan for new names and addresses; use Services for anything stable.
+* Labels connect everything. A mismatched label is a common cause of "my Service has no endpoints".
+* Rollouts and rollbacks are built in, and a failed rollout leaves the old version serving.
+
+== Knowledge Check
+
+*You delete a pod that belongs to a Deployment with three replicas. What happens?*
+
+.Answer
+[%collapsible]
+====
+Its ReplicaSet creates a replacement pod with a new name, so there are three again.
+====
+
+*A Service has no endpoints even though its pods are running. What do you check first?*
+
+.Answer
+[%collapsible]
+====
+That the Service's selector matches the pods' labels exactly, for example with `oc get pods --show-labels`.
+====
+
+*What is the difference between `spec` and `status`?*
+
+.Answer
+[%collapsible]
+====
+`spec` is what you asked for. `status` is what Kubernetes reports actually exists. Controllers work to make `status` match `spec`.
+====

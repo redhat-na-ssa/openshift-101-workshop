@@ -8,6 +8,7 @@ asciidoc:
   attributes:
     lab_name: "OpenShift Primer"
     release-version: master
+    d0-examples: https://raw.githubusercontent.com/shpwrck/openshift-101-workshop/main/content/modules/ROOT/examples
     page-pagination: true
     page-links:
     - url: https://github.com/shpwrck/retail-store-sample-app

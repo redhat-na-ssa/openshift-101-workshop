@@ -1,0 +1,160 @@
+= Setup Requirements
+
+This page lists everything needed to run Day Zero (Container & OpenShift Fundamentals).
+The instructor prepares the cluster ahead of time, and attendees only need the items under <<workstation>>.
+
+NOTE: Requirements for Days One and Two are not on this page yet.
+
+Day Zero is demo-led: the instructor runs every demo, and attendees who have cluster access can follow along in their own project.
+One shared cluster serves the whole class.
+
+== Cluster
+
+* OpenShift Container Platform 4.22.
+* At least three worker nodes, with room for every attendee's demo pods (about 1 CPU core and 1.5 GiB of memory requested per attendee at the busiest point, in Module 4).
+* Enough spare capacity to drain one worker in Module 5, if the instructor plans to show it.
+* A default StorageClass with dynamic provisioning and `ReadWriteOnce` block volumes, for Module 4, such as the vSphere CSI driver or OpenShift Data Foundation's Ceph RBD.
+Avoid an NFS class as the default: PostgreSQL refuses to start when its data directory isn't owned by the user it runs as, which is common on NFS exports that map file ownership.
+* A wildcard DNS name for the default ingress (`*.apps.CLUSTER_DOMAIN`) that attendees' computers can resolve and reach, for Routes in Modules 3 and 4.
+
+== Operators and Cluster Components
+
+These are installed and enabled by default.
+Check them on clusters that were installed with optional capabilities turned off.
+
+[cols="1,2",options="header"]
+|===
+|Component |Used for
+
+|Builds (`Build` capability) and the internal image registry, with storage configured
+|Source-to-Image build in Module 3
+
+|Cluster Samples Operator (`openshift-samples` capability), with the `httpd` ImageStream in the `openshift` project
+|The builder image for the Module 3 build
+
+|Web console (`Console` capability)
+|Modules 3 and 5
+
+|Platform monitoring
+|`oc adm top nodes` in Module 5
+|===
+
+*Optional:* the Web Terminal Operator, from the console's Operator catalog.
+It gives every attendee a terminal with `oc` inside the console, which avoids installing anything locally and is the easiest option for attendees on Windows, since the demo commands use Linux shell syntax.
+
+== Attendee Accounts, Projects and Roles
+
+Each attendee needs:
+
+* a user account in the cluster's identity provider
+* their own project, in which they hold the `admin` role
+* the `cluster-reader` role across the cluster, for the read-only node, Operator and StorageClass commands in Modules 3 to 5
+
+The instructor needs `cluster-admin`, for the steps marked *Instructor only*.
+
+Create a group for the attendees, replacing the user names with real ones:
+
+[source,sh,role=execute]
+----
+oc adm groups new day-zero-attendees \
+  user1 \
+  user2
+----
+
+Give the group read access to the whole cluster:
+
+[source,sh,role=execute]
+----
+oc adm policy add-cluster-role-to-group cluster-reader \
+  day-zero-attendees
+----
+
+For each attendee, create a project and make them its administrator, replacing `USER` with the attendee's user name:
+
+[source,sh,role=execute]
+----
+oc new-project day0-USER
+----
+
+[source,sh,role=execute]
+----
+oc adm policy add-role-to-user admin USER \
+  --namespace day0-USER
+----
+
+== Instructor Workstation
+
+* `oc` 4.22, logged in as a cluster administrator.
+* For Module 1 Part 1: a Linux machine (RHEL 9 or Fedora) with Podman, `curl` and `lsns` (from `util-linux`), on which the instructor can share a terminal.
+
+[#workstation]
+== Attendee Workstation
+
+* A current web browser, and the video call software.
+* To follow along, either:
+** the Web Terminal in the console, if the instructor installed it, or
+** the `oc` command-line tool, version 4.22, from the console's *?* (help) menu under *Command line tools*, in a Linux or macOS shell, or in WSL on Windows; plus `curl`.
+
+== Network and Image Access
+
+The cluster's nodes pull from:
+
+* `registry.access.redhat.com` (UBI images, httpd)
+* `registry.k8s.io` (the `agnhost` web server)
+* `quay.io` (PostgreSQL)
+* `docker.io` (nginx in Module 3; Docker Hub limits anonymous pulls per address, so a large class behind one address may need a mirror or a logged-in pull secret)
+* `github.com` (the Source-to-Image build clones its source repository)
+
+Attendees' computers, or the Web Terminal, reach:
+
+* the cluster's API and console
+* `raw.githubusercontent.com`, where `oc apply` reads the example files
+* the cluster's Routes under `*.apps.CLUSTER_DOMAIN`
+
+== Verification Checklist
+
+Run these as one of the attendees, after logging in with `oc login`.
+
+They can create Deployments in their project (expect `yes`):
+
+[source,sh,role=execute]
+----
+oc auth can-i create deployments
+----
+
+They can read cluster Operators (expect `yes`):
+
+[source,sh,role=execute]
+----
+oc auth can-i list clusteroperators
+----
+
+They can see node usage (expect a table of nodes):
+
+[source,sh,role=execute]
+----
+oc adm top nodes
+----
+
+A default StorageClass exists (expect one class marked `(default)`):
+
+[source,sh,role=execute]
+----
+oc get storageclass
+----
+
+The builder image for Module 3 exists:
+
+[source,sh,role=execute]
+----
+oc get imagestream httpd \
+  --namespace openshift
+----
+
+The internal registry is running (expect every replica ready under `READY`, such as `2/2`; `NotFound` means the registry is turned off):
+
+[source,sh,role=execute]
+----
+oc get deployment image-registry \
+  --namespace openshift-image-registry
+----

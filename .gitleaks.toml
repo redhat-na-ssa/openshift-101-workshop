@@ -34,6 +34,8 @@ regexes = [
   '''^cGFzc3dvcmQ=$''',
   # docker-registry pull secret example
   '''^mypassword$''',
+  # database password placeholder in the Day Zero Secret example
+  '''^change-me-later$''',
 ]
 
 # Commit c324c34 added a kubeconfig example for a local CodeReady Containers

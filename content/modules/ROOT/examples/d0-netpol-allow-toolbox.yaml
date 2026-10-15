@@ -1,0 +1,19 @@
+# Lets the toolbox pod, and only the toolbox pod, reach the site pods on port 8080.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-toolbox-to-site
+spec:
+  podSelector:
+    matchLabels:
+      app: site
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: toolbox
+    ports:
+    - protocol: TCP
+      port: 8080

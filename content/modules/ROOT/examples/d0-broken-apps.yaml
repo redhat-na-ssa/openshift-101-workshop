@@ -1,0 +1,135 @@
+# Four applications, each broken in a different, common way.
+# Module 5 troubleshoots them one at a time.
+---
+# 1. The image tag does not exist.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-image
+  labels:
+    app: broken-image
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-image
+  template:
+    metadata:
+      labels:
+        app: broken-image
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: app
+        image: registry.k8s.io/e2e-test-images/agnhost:9.99-does-not-exist
+        args:
+        - netexec
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+---
+# 2. The application starts, complains about missing configuration, and exits.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-crash
+  labels:
+    app: broken-crash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-crash
+  template:
+    metadata:
+      labels:
+        app: broken-crash
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: app
+        image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+        command:
+        - sh
+        - -c
+        - |
+          echo "Starting inventory service..."
+          if [ -z "$DATABASE_URL" ]; then
+            echo "ERROR: DATABASE_URL is not set" >&2
+            exit 1
+          fi
+          sleep infinity
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+---
+# 3. The pod asks for more CPU than any node has.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-pending
+  labels:
+    app: broken-pending
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-pending
+  template:
+    metadata:
+      labels:
+        app: broken-pending
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: app
+        image: registry.k8s.io/e2e-test-images/agnhost:2.56
+        args:
+        - netexec
+        resources:
+          requests:
+            cpu: "500"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+---
+# 4. The pod insists on running as root (user 0).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-root
+  labels:
+    app: broken-root
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-root
+  template:
+    metadata:
+      labels:
+        app: broken-root
+    spec:
+      containers:
+      - name: app
+        image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+        command:
+        - sleep
+        - infinity
+        securityContext:
+          runAsUser: 0

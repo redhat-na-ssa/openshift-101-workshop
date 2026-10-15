@@ -1,0 +1,393 @@
+= Module 3: What OpenShift Adds
+
+[NOTE]
+====
+*Validation status:* the command-line steps on this page were run on a single-node OpenShift 4.21 cluster on 15 October 2026, and have not yet been run on 4.22.
+The console tour and the console's *Import from Git* steps describe the 4.22 console and have not been checked yet.
+====
+
+*Time:* 70 minutes
+
+Kubernetes is the engine.
+On its own it doesn't include a web console, a way to expose applications to the outside world, monitoring, an image registry, or an operating system to run on, and each team that runs plain Kubernetes chooses and maintains those pieces themselves.
+OpenShift is the complete car: Kubernetes plus all of those parts, tested together, installed together and upgraded together.
+
+.In this module
+* <<console>>
+* <<whats-included>>
+* <<operators>>
+* <<architecture>>
+* <<projects-routes>>
+* <<rbac>>
+* <<scc>>
+* <<demo>>
+* <<recap>>
+
+[#console]
+== The Web Console First
+
+The OpenShift web console shows almost everything that the command line does, and for most people it is the easier place to start.
+The instructor tours it before any YAML:
+
+* *Workloads*: Deployments, pods and their logs, events and a terminal into each running container
+* *Topology*: a picture of the applications in a project and how they connect
+* *Networking*: Services and Routes
+* *Storage*: PersistentVolumeClaims and StorageClasses
+* *Observe*: metrics, alerts and dashboards, built in
+* *Administration*: projects, users, quotas and cluster settings, depending on your access
+* *The catalog of Operators*: add-on software, installed and upgraded from the console
+
+[NOTE]
+====
+Older OpenShift releases split the console into an Administrator view and a Developer view.
+Since OpenShift 4.19 there is one combined view, and the separate Developer view is off unless a cluster administrator turns it back on.
+Screenshots and videos from older releases look different.
+====
+
+[#whats-included]
+== What Comes in the Box
+
+Router:: Takes outside traffic to the right application, configured with Routes (or standard Kubernetes Ingress).
+Internal image registry:: Stores images built inside the cluster.
+Builds:: Turn source code into an image inside the cluster, with no build tools on anyone's laptop.
+Monitoring:: Prometheus and Alertmanager collect metrics and raise alerts for the cluster, with dashboards in the console.
+Console and `oc`:: The web console and the `oc` command-line tool, which includes everything `kubectl` does.
+Operating system:: Red Hat Enterprise Linux CoreOS on every node, managed by the cluster itself.
+Security defaults:: Containers run as non-root and with restricted privileges unless an administrator allows more.
+
+[#operators]
+== Operators: How the Cluster Runs Itself
+
+An *Operator* is a controller, like the ones in Module 2, that knows how to install, configure and upgrade one piece of software.
+You describe what you want in a custom object, and the Operator keeps the software matching it.
+
+OpenShift's own parts are run by Operators.
+The router, the registry, monitoring, the console and the node operating system each have a *cluster Operator*, and the list of cluster Operators is the quickest health check of the whole platform.
+Upgrading OpenShift means asking the cluster to move to a new version, then letting the Operators update their parts one by one.
+
+The catalog in the console offers more Operators, from Red Hat and from partners, for things like databases, GitOps and logging.
+
+[#architecture]
+== How a Cluster Is Put Together
+
+Control plane nodes::
+Usually three.
+They run the Kubernetes API server (everything you do in the console or with `oc` goes through it), the scheduler, the controllers, and *etcd*, the database that stores every object in the cluster.
+Applications don't run here.
+
+Worker nodes::
+Run your applications' pods.
+You add workers to add capacity.
+
+Red Hat Enterprise Linux CoreOS (RHCOS)::
+The operating system on every node.
+It is built to be run by the cluster: its system files are read-only, and it is updated as a whole image along with OpenShift, not package by package.
+
+Machine Config Operator (MCO)::
+Applies operating system configuration to nodes from objects called *MachineConfigs*, then keeps the nodes matching them.
+Nodes are grouped into pools, such as `master` and `worker`, and a change rolls through a pool one node at a time, usually with a reboot.
+You don't log in to nodes to change them; you change the MachineConfig and the MCO does the rest.
+
+[#projects-routes]
+== Projects and Routes
+
+A *project* is a Kubernetes namespace with OpenShift additions.
+When it is created, OpenShift gives it default access rights for the person who asked for it, and a range of user IDs that its containers will run as (see <<scc>>).
+Regular users usually create projects, and cluster administrators decide who may.
+
+A *Route* gives a Service a host name that people outside the cluster can reach, for example `web-myproject.apps.cluster.example.com`.
+The router handles TLS for it if asked.
+OpenShift also accepts standard Kubernetes Ingress objects and turns them into Routes.
+
+[#rbac]
+== Who Can Do What: RBAC
+
+Role-based access control works in four pieces:
+
+* *Users* are people, usually signed in through a company identity provider. *Groups* collect users.
+* *Service accounts* are identities for applications and automation inside the cluster.
+* A *role* lists actions (`get`, `list`, `create`, `delete`...) on kinds of objects (pods, deployments, secrets...). A *ClusterRole* is the same thing defined once for the whole cluster.
+* A *role binding* grants a role to users, groups or service accounts in one project. A *cluster role binding* grants it across the whole cluster.
+
+OpenShift ships ready-made roles such as `admin`, `edit` and `view` for projects, and `cluster-reader` for read-only access to the whole cluster.
+
+[#scc]
+== Why Containers Run Without Root: SCCs
+
+Many images on the internet expect to start as `root`.
+On OpenShift, by default, they can't.
+
+*Security Context Constraints (SCCs)* decide what a pod may do: which user it runs as, which Linux capabilities it has, whether it may use the host's network or files.
+The default for ordinary workloads, `restricted-v2`, runs every container as a non-root user ID taken from its project's range, with no extra privileges.
+
+That limits what an attacker can do from inside a compromised container, and it's also the most common reason an image that "works on Docker" fails on OpenShift: it tries to write files only `root` can write.
+The right fix is almost always an image built to run as any user ID, not a looser SCC.
+Red Hat's images and many vendors' images are built that way.
+
+[#demo]
+== Demo: Console, Source-to-Image, Routes and Security
+
+=== Tour the console (Instructor)
+
+The instructor opens the console URL and walks through the areas listed in <<console>>, opening the `web` Deployment from Module 2 to show its pods, logs, events and the built-in terminal.
+
+Everyone can follow along in the console in their own project.
+
+=== Deploy an application from source code
+
+*Source-to-Image (S2I)* builds an image from a Git repository using a builder image that knows the language, then deploys it.
+Nobody needs a Dockerfile or build tools.
+Use the console or the command line, not both, because they create objects with the same name.
+
+In the console::
+. Open the *+* (quick create) menu at the top of the console and choose *Import from Git*.
+. For *Git Repo URL*, enter `https://github.com/sclorg/httpd-ex.git`.
+. If the builder image isn't detected, select *Httpd*.
+. Set *Name* to `hello-s2i`, leave *Create a route* selected, and click *Create*.
+. Open the new application in *Topology* and watch the build run, then open its Route.
+
+On the command line::
+Create the build and the deployment:
++
+[source,sh,role=execute]
+----
+oc new-app \
+  httpd~https://github.com/sclorg/httpd-ex.git \
+  --name hello-s2i
+----
++
+Follow the build's log until it pushes the image:
++
+[source,sh,role=execute]
+----
+oc logs \
+  --follow \
+  buildconfig/hello-s2i
+----
++
+Give the application a Route:
++
+[source,sh,role=execute]
+----
+oc expose service/hello-s2i
+----
+
+Either way, list what was created: a BuildConfig, a build, an ImageStream that tracks the image in the internal registry, a Deployment, a Service and a Route:
+
+[source,sh,role=execute]
+----
+oc get buildconfigs,builds,imagestreams,deployments,services,routes \
+  --selector app=hello-s2i
+----
+
+=== Expose the web application
+
+Give the `web` Service from Module 2 a Route:
+
+[source,sh,role=execute]
+----
+oc expose service/web
+----
+
+Save its host name:
+
+[source,sh,role=execute]
+----
+HOST=$(oc get route web \
+  --output jsonpath='{.spec.host}')
+----
+
+Call it through the router, the same way someone outside the cluster would.
+The request goes to the router first, then to one of the pods:
+
+[source,sh,role=execute]
+----
+curl "http://$HOST/hostname"
+----
+
+If the reply is a page that says *Application is not available*, the router hasn't picked up the new Route yet.
+Wait a few seconds and run it again.
+
+=== Look at the cluster's parts
+
+These commands need read access to the whole cluster, which xref:setup-requirements.adoc[Setup Requirements] grants to attendees.
+
+List the nodes and their roles:
+
+[source,sh,role=execute]
+----
+oc get nodes
+----
+
+List the cluster Operators.
+`AVAILABLE` should be `True` and `DEGRADED` should be `False` for every one:
+
+[source,sh,role=execute]
+----
+oc get clusteroperators
+----
+
+List the machine config pools, which show whether every node has the configuration it should:
+
+[source,sh,role=execute]
+----
+oc get machineconfigpools
+----
+
+Show the cluster's version and whether an update is in progress:
+
+[source,sh,role=execute]
+----
+oc get clusterversion
+----
+
+*Instructor only:* show that a node runs RHCOS, replacing `NODE_NAME` with a name from `oc get nodes`.
+This starts a temporary debugging pod on the node:
+
+[source,sh,role=execute]
+----
+oc debug node/NODE_NAME \
+  -- chroot /host cat /etc/os-release
+----
+
+It may print a Pod Security warning first.
+That's expected: the debugging pod needs full access to the node, which ordinary pods never get.
+
+=== Check what you're allowed to do
+
+Ask the cluster whether you can create Deployments in your project:
+
+[source,sh,role=execute]
+----
+oc auth can-i create deployments
+----
+
+Ask whether you can delete nodes:
+
+[source,sh,role=execute]
+----
+oc auth can-i delete nodes
+----
+
+List the role bindings in your project, which show who holds which role there:
+
+[source,sh,role=execute]
+----
+oc get rolebindings
+----
+
+=== Watch the security defaults at work
+
+Deploy the community `nginx` image, which expects to start as root:
+
+.d0-nginx-deployment.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-nginx-deployment.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-nginx-deployment.yaml
+----
+
+After a few seconds, its pod shows `Error` and then `CrashLoopBackOff`:
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector app=nginx
+----
+
+Read its log.
+nginx can't create its cache directory, because it isn't running as root:
+
+[source,sh,role=execute]
+----
+oc logs deployment/nginx
+----
+
+See which SCC admitted the pod:
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector app=nginx \
+  --output jsonpath='{.items[0].metadata.annotations.openshift\.io/scc}{"\n"}'
+----
+
+And which user ID it was given:
+
+[source,sh,role=execute]
+----
+oc get pods \
+  --selector app=nginx \
+  --output jsonpath='{.items[0].spec.containers[0].securityContext.runAsUser}{"\n"}'
+----
+
+That number comes from the range OpenShift assigned to your project.
+Find the `openshift.io/sa.scc.uid-range` annotation here:
+
+[source,sh,role=execute]
+----
+oc get project "$(oc project --short)" \
+  --output yaml
+----
+
+Fix it the right way: switch to a build of nginx made to run as any user:
+
+[source,sh,role=execute]
+----
+oc set image deployment/nginx \
+  nginx=docker.io/nginxinc/nginx-unprivileged:1.27
+----
+
+[source,sh,role=execute]
+----
+oc rollout status deployment/nginx
+----
+
+Clean up the nginx Deployment:
+
+[source,sh,role=execute]
+----
+oc delete deployment nginx
+----
+
+[#recap]
+== What Changes for You
+
+* OpenShift is Kubernetes plus the parts every team would otherwise assemble: console, router, registry, builds, monitoring, operating system.
+* The cluster runs itself through Operators. `oc get clusteroperators` is your first health check.
+* Nodes are configured by MachineConfigs, not by logging in. Expect configuration changes to reboot nodes one at a time.
+* Containers run as a random non-root user. When an image fails with "permission denied", look for a non-root build of it before asking for a looser SCC.
+
+== Knowledge Check
+
+*Where do you look first to see whether the platform itself is healthy?*
+
+.Answer
+[%collapsible]
+====
+The cluster Operators, with `oc get clusteroperators` or the cluster settings page in the console.
+====
+
+*An administrator needs a kernel setting changed on every worker. How is it done?*
+
+.Answer
+[%collapsible]
+====
+With a MachineConfig for the `worker` pool. The Machine Config Operator applies it to one node at a time, usually rebooting each.
+====
+
+*A vendor image works under Docker but crashes on OpenShift with "permission denied". What is the likely cause?*
+
+.Answer
+[%collapsible]
+====
+The image expects to run as root, and OpenShift runs it as a random non-root user ID. Ask the vendor for an image that supports running as any user.
+====

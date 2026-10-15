@@ -1,0 +1,431 @@
+= Module 4: Configuration, Storage and Networking
+
+[NOTE]
+====
+*Validation status:* every step on this page was run on a single-node OpenShift 4.21 cluster on 15 October 2026, with iSCSI block storage for the database.
+It has not yet been run on 4.22.
+On that cluster the Route kept answering under the deny-all policy (see the note in the demo), so the Route part of the firewall demo is not yet confirmed on a multi-node cluster.
+====
+
+*Time:* 55 minutes
+
+An image is the same everywhere it runs, so anything that differs between environments, such as settings, passwords, data and network access, has to come from outside the image.
+This module covers the three ways it does.
+
+.In this module
+* <<config>>
+* <<storage>>
+* <<networking>>
+* <<demo>>
+* <<recap>>
+
+[#config]
+== Settings and Credentials: ConfigMaps and Secrets
+
+A *ConfigMap* holds settings as keys and values: a log level, a feature switch, or a whole configuration file.
+A *Secret* holds sensitive values the same way: passwords, API keys, TLS certificates.
+
+A pod can receive either one in two ways:
+
+* as *environment variables*, read when the container starts
+* as *files* in a directory, which are updated while the container runs if the ConfigMap or Secret changes
+
+The same image can then run in test and production with different ConfigMaps and Secrets.
+
+[IMPORTANT]
+====
+A Secret's values are only base64-encoded, which anyone can decode.
+What protects a Secret is who may read it (RBAC limits it to the people and applications that need it) and, if the cluster administrator turns it on, encryption of the cluster's database.
+Many organizations go further and keep credentials in an external vault, synchronized into the cluster.
+====
+
+[#storage]
+== Storage That Outlives a Container
+
+A container's own files disappear when the container is replaced, as Module 1 showed.
+Data that must survive goes on a *volume*.
+
+PersistentVolumeClaim (PVC)::
+A request for storage, made by an application: "1 GiB, mounted by one node at a time."
+The application never names a disk or a datastore.
+
+PersistentVolume (PV)::
+An actual piece of storage that satisfies a claim.
+A claim and its volume are *bound* one to one.
+
+StorageClass::
+A kind of storage the cluster offers, such as fast block storage or shared file storage, and how to create it.
+When a claim names a class, or the cluster has a default class, a volume is created for it automatically.
+This is called *dynamic provisioning*.
+
+CSI driver::
+The plug-in, usually from the storage vendor, that a StorageClass uses to create, attach and delete volumes on a particular storage system.
+
+The *access mode* says how a volume can be shared:
+
+* `ReadWriteOnce` (RWO): mounted read-write by one node at a time. Typical for block storage and databases.
+* `ReadWriteMany` (RWX): mounted read-write by many nodes at once. Needs shared file storage.
+
+Deleting a pod leaves its claim, and its data, in place.
+What happens to the data when the _claim_ is deleted depends on the StorageClass's reclaim policy, usually `Delete`.
+
+[#networking]
+== How Containers Talk to Each Other
+
+Every pod gets its own IP address on the cluster's pod network, and every pod can reach every other pod by default, on any node, without address translation.
+OpenShift builds that network with *OVN-Kubernetes*, which is software-defined: the pod network is an overlay across the nodes, separate from the network the nodes themselves sit on.
+
+Because pod addresses change whenever pods are replaced, applications reach each other through Services, by name:
+
+* `web` from inside the same project
+* `web.myproject.svc.cluster.local` from anywhere in the cluster
+
+A *NetworkPolicy* restricts that default openness:
+
+* Until a policy selects a pod, all traffic to it is allowed.
+* Once any policy selects a pod, only traffic that some policy allows can reach it.
+* Policies only ever _allow_ traffic, and they select pods and projects by label.
+
+A common pattern is a "deny everything" policy for a project, followed by small policies that allow each connection the application needs.
+
+[#demo]
+== Demo: Files from a ConfigMap, a Database on Storage, and a Firewall
+
+Everyone can follow this demo in their own project.
+
+=== Serve a page from a ConfigMap
+
+Create a ConfigMap holding one file, `index.html`:
+
+[source,sh,role=execute]
+----
+oc create configmap site-content \
+  --from-literal=index.html='<h1>Hello from a ConfigMap</h1>'
+----
+
+Deploy a web server that mounts it as its web root:
+
+.d0-site.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-site.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-site.yaml
+----
+
+[source,sh,role=execute]
+----
+oc rollout status deployment/site
+----
+
+Request the page from the `toolbox` pod:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent http://site:8080
+----
+
+Change the ConfigMap without touching the image or the Deployment.
+This builds the new version of the ConfigMap and replaces the old one with it:
+
+[source,sh,role=execute]
+----
+oc create configmap site-content \
+  --from-literal=index.html='<h1>Changed without a new image</h1>' \
+  --dry-run=client \
+  --output yaml | oc replace --filename -
+----
+
+Request the page again.
+The file inside the running container is updated within about a minute, so repeat the command until the new text appears:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent http://site:8080
+----
+
+=== Run a database on persistent storage
+
+Create a Secret with the database's user name and password:
+
+[source,sh,role=execute]
+----
+oc create secret generic db-credentials \
+  --from-literal=POSTGRESQL_USER=workshop \
+  --from-literal=POSTGRESQL_PASSWORD=change-me-later
+----
+
+Look at it as the cluster stores it.
+The values under `data` are base64, not encrypted:
+
+[source,sh,role=execute]
+----
+oc get secret db-credentials \
+  --output yaml
+----
+
+Anyone allowed to read the Secret can decode it:
+
+[source,sh,role=execute]
+----
+oc extract secret/db-credentials \
+  --to=-
+----
+
+Deploy PostgreSQL with a 1 GiB claim.
+The Deployment reads its user name and password from the Secret, and mounts the claim where PostgreSQL keeps its data:
+
+.d0-database.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-database.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-database.yaml
+----
+
+Check the claim.
+It may show `Pending` until the database pod is scheduled, because many StorageClasses wait to create the volume until they know which node needs it.
+Then it shows `Bound`, with the name of the volume created for it:
+
+[source,sh,role=execute]
+----
+oc get pvc db-data
+----
+
+Wait for the database to start.
+The Deployment only reports the pod ready once PostgreSQL accepts connections:
+
+[source,sh,role=execute]
+----
+oc rollout status deployment/db \
+  --timeout=180s
+----
+
+See which StorageClass provided the volume:
+
+[source,sh,role=execute]
+----
+oc get storageclass
+----
+
+Create a table and add a row:
+
+[source,sh,role=execute]
+----
+oc exec deployment/db -- \
+  psql \
+    --dbname inventory \
+    --command "CREATE TABLE servers (name text); INSERT INTO servers VALUES ('esx01');"
+----
+
+Delete the database's pod.
+The Deployment replaces it, and the new pod mounts the same volume:
+
+[source,sh,role=execute]
+----
+oc delete pod \
+  --selector app=db
+----
+
+[source,sh,role=execute]
+----
+oc rollout status deployment/db \
+  --timeout=180s
+----
+
+The row is still there:
+
+[source,sh,role=execute]
+----
+oc exec deployment/db -- \
+  psql \
+    --dbname inventory \
+    --command "SELECT * FROM servers;"
+----
+
+=== Lock down the network
+
+Confirm that the `toolbox` pod can reach both web applications:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent --max-time 5 http://site:8080
+----
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent --max-time 5 http://web:8080/hostname
+----
+
+Apply a policy that selects every pod in the project and allows nothing in:
+
+.d0-netpol-deny-all.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-netpol-deny-all.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-netpol-deny-all.yaml
+----
+
+Both requests now time out after five seconds:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent --max-time 5 http://site:8080
+----
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent --max-time 5 http://web:8080/hostname
+----
+
+The `web` Route from Module 3 stops working too, because the router is outside the project.
+Save its host name again if your terminal has lost it:
+
+[source,sh,role=execute]
+----
+HOST=$(oc get route web \
+  --output jsonpath='{.spec.host}')
+----
+
+Through the router, the request now fails:
+
+[source,sh,role=execute]
+----
+curl \
+  --max-time 5 \
+  "http://$HOST/hostname"
+----
+
+[NOTE]
+====
+On clusters where the router runs on the nodes' own network, which is the default on vSphere, bare metal and single-node clusters, the router can still reach pods on its own node.
+There, some or all of these requests may still succeed.
+The instructor checks this before the class and can skip the Route part of the demo if it doesn't fail.
+====
+
+Allow the `toolbox` pod, and only it, to reach the `site` pods:
+
+.d0-netpol-allow-toolbox.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-netpol-allow-toolbox.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-netpol-allow-toolbox.yaml
+----
+
+The `site` page loads again, but `web` stays blocked:
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent --max-time 5 http://site:8080
+----
+
+[source,sh,role=execute]
+----
+oc exec toolbox -- curl --silent --max-time 5 http://web:8080/hostname
+----
+
+Allow traffic from the OpenShift router into the project, so Routes work again.
+The router's project carries a label that OpenShift provides for exactly this:
+
+.d0-netpol-allow-router.yaml
+[%collapsible]
+====
+[source,yaml]
+----
+include::example$d0-netpol-allow-router.yaml[]
+----
+====
+
+[source,sh,role=execute,subs="attributes+"]
+----
+oc apply \
+  --filename {d0-examples}/d0-netpol-allow-router.yaml
+----
+
+[source,sh,role=execute]
+----
+curl \
+  --max-time 5 \
+  "http://$HOST/hostname"
+----
+
+List the policies now in force:
+
+[source,sh,role=execute]
+----
+oc get networkpolicies
+----
+
+Remove them before Module 5, so they don't get in the way:
+
+[source,sh,role=execute]
+----
+oc delete networkpolicy \
+  deny-all-ingress \
+  allow-toolbox-to-site \
+  allow-from-openshift-ingress
+----
+
+[#recap]
+== What Changes for You
+
+* Settings and credentials live in ConfigMaps and Secrets, not in images. Changing them doesn't need a new image.
+* A Secret is protected by access control and optional encryption, not by its encoding.
+* Applications ask for storage with a claim. The StorageClass and its CSI driver decide where the volume comes from.
+* Pod-to-pod traffic is open until a NetworkPolicy selects a pod. Remember the router when you lock a project down.
+
+== Knowledge Check
+
+*A database pod is deleted. Is its data lost?*
+
+.Answer
+[%collapsible]
+====
+Not if the data is on a PersistentVolumeClaim. The replacement pod mounts the same volume. Data written anywhere else in the container is lost.
+====
+
+*Your claim stays `Pending`, and no pod uses it yet. Is something wrong?*
+
+.Answer
+[%collapsible]
+====
+Probably not. Many StorageClasses wait until a pod that uses the claim is scheduled, so they can create the volume where that pod runs.
+====
+
+*You add a deny-all NetworkPolicy and your application's Route stops working. Why?*
+
+.Answer
+[%collapsible]
+====
+The router runs in another project, so its traffic is blocked too. Add a policy that allows traffic from the router's project.
+====

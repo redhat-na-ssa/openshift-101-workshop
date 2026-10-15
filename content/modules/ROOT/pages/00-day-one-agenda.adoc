@@ -1,5 +1,7 @@
 = Day One Agenda
 
+New to containers and Kubernetes? Start with xref:d0-00-agenda.adoc[Day Zero].
+
 * xref:01-background.adoc[Background]
 * xref:02-whatisopenshift.adoc[What is OpenShift?]
 * xref:03-ocp-vs-k8s.adoc[OpenShift vs Kubernetes]

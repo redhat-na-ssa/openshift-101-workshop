@@ -1,0 +1,28 @@
+# A long-running pod with a few everyday tools (ps, curl, hostname).
+# The limits below become cgroup settings that you can read from inside it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: toolbox
+  labels:
+    app: toolbox
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: toolbox
+    image: registry.access.redhat.com/ubi9/httpd-24:latest
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 250m
+        memory: 128Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
