@@ -2,8 +2,9 @@
 
 [NOTE]
 ====
-*Validation status:* the steps on this page have not yet been checked on a live OpenShift 4.22 cluster.
-The images they use were checked to start and run as a non-root user in October 2026.
+*Validation status:* every step on this page was run on a single-node OpenShift 4.21 cluster on 15 October 2026, with iSCSI block storage for the database.
+It has not yet been run on 4.22.
+On that cluster the Route kept answering under the deny-all policy (see the note in the demo), so the Route part of the firewall demo is not yet confirmed on a multi-node cluster.
 ====
 
 *Time:* 55 minutes
@@ -131,14 +132,15 @@ Request the page from the `toolbox` pod:
 oc exec toolbox -- curl --silent http://site:8080
 ----
 
-Change the ConfigMap without touching the image or the Deployment:
+Change the ConfigMap without touching the image or the Deployment.
+This builds the new version of the ConfigMap and replaces the old one with it:
 
 [source,sh,role=execute]
 ----
 oc create configmap site-content \
   --from-literal=index.html='<h1>Changed without a new image</h1>' \
   --dry-run=client \
-  --output yaml | oc apply --filename -
+  --output yaml | oc replace --filename -
 ----
 
 Request the page again.
@@ -204,7 +206,8 @@ Then it shows `Bound`, with the name of the volume created for it:
 oc get pvc db-data
 ----
 
-Wait for the database to start:
+Wait for the database to start.
+The Deployment only reports the pod ready once PostgreSQL accepts connections:
 
 [source,sh,role=execute]
 ----
@@ -314,6 +317,13 @@ curl \
   --max-time 5 \
   "http://$HOST/hostname"
 ----
+
+[NOTE]
+====
+On clusters where the router runs on the nodes' own network, which is the default on vSphere, bare metal and single-node clusters, the router can still reach pods on its own node.
+There, some or all of these requests may still succeed.
+The instructor checks this before the class and can skip the Route part of the demo if it doesn't fail.
+====
 
 Allow the `toolbox` pod, and only it, to reach the `site` pods:
 

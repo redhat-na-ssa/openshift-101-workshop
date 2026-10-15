@@ -2,8 +2,8 @@
 
 [NOTE]
 ====
-*Validation status:* the steps on this page have not yet been checked on a live OpenShift 4.22 cluster.
-The images they use were checked to start and run as a non-root user in October 2026.
+*Validation status:* every step on this page was run on a single-node OpenShift 4.21 cluster on 15 October 2026.
+It has not yet been run on 4.22.
 ====
 
 *Time:* 60 minutes

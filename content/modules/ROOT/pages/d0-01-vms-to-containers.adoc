@@ -3,7 +3,7 @@
 [NOTE]
 ====
 *Validation status:* the Podman steps and image details on this page were checked on a Linux host in October 2026.
-Steps that run on OpenShift have not yet been checked on a live OpenShift 4.22 cluster.
+The OpenShift steps were run on a single-node OpenShift 4.21 cluster on 15 October 2026, and have not yet been run on 4.22.
 ====
 
 *Time:* 60 minutes

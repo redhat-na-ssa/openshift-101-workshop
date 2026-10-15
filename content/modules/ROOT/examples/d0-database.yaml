@@ -52,6 +52,14 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/pgsql/data
+        # Ready only once PostgreSQL accepts connections, so that
+        # "oc rollout status" waits for the database, not just the container.
+        readinessProbe:
+          exec:
+            command:
+            - /usr/libexec/check-container
+          initialDelaySeconds: 5
+          periodSeconds: 5
         resources:
           requests:
             cpu: 100m

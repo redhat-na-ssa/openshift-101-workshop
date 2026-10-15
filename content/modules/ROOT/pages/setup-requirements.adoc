@@ -13,7 +13,8 @@ One shared cluster serves the whole class.
 * OpenShift Container Platform 4.22.
 * At least three worker nodes, with room for every attendee's demo pods (about 1 CPU core and 1.5 GiB of memory requested per attendee at the busiest point, in Module 4).
 * Enough spare capacity to drain one worker in Module 5, if the instructor plans to show it.
-* A default StorageClass with dynamic provisioning and `ReadWriteOnce` volumes, for Module 4.
+* A default StorageClass with dynamic provisioning and `ReadWriteOnce` block volumes, for Module 4, such as the vSphere CSI driver or OpenShift Data Foundation's Ceph RBD.
+Avoid an NFS class as the default: PostgreSQL refuses to start when its data directory isn't owned by the user it runs as, which is common on NFS exports that map file ownership.
 * A wildcard DNS name for the default ingress (`*.apps.CLUSTER_DOMAIN`) that attendees' computers can resolve and reach, for Routes in Modules 3 and 4.
 
 == Operators and Cluster Components
@@ -150,10 +151,10 @@ oc get imagestream httpd \
   --namespace openshift
 ----
 
-The internal registry is running (expect `Managed`):
+The internal registry is running (expect every replica ready under `READY`, such as `2/2`; `NotFound` means the registry is turned off):
 
 [source,sh,role=execute]
 ----
-oc get configs.imageregistry.operator.openshift.io cluster \
-  --output jsonpath='{.spec.managementState}{"\n"}'
+oc get deployment image-registry \
+  --namespace openshift-image-registry
 ----

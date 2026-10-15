@@ -2,8 +2,8 @@
 
 [NOTE]
 ====
-*Validation status:* the steps on this page have not yet been checked on a live OpenShift 4.22 cluster.
-The images they use were checked to start and run as a non-root user in October 2026.
+*Validation status:* the command-line steps on this page were run on a single-node OpenShift 4.21 cluster on 15 October 2026, and have not yet been run on 4.22.
+The console tour and the console's *Import from Git* steps describe the 4.22 console and have not been checked yet.
 ====
 
 *Time:* 70 minutes
@@ -205,6 +205,9 @@ The request goes to the router first, then to one of the pods:
 curl "http://$HOST/hostname"
 ----
 
+If the reply is a page that says *Application is not available*, the router hasn't picked up the new Route yet.
+Wait a few seconds and run it again.
+
 === Look at the cluster's parts
 
 These commands need read access to the whole cluster, which xref:setup-requirements.adoc[Setup Requirements] grants to attendees.
@@ -246,6 +249,9 @@ This starts a temporary debugging pod on the node:
 oc debug node/NODE_NAME \
   -- chroot /host cat /etc/os-release
 ----
+
+It may print a Pod Security warning first.
+That's expected: the debugging pod needs full access to the node, which ordinary pods never get.
 
 === Check what you're allowed to do
 

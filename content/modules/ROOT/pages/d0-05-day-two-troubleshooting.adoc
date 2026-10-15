@@ -2,8 +2,8 @@
 
 [NOTE]
 ====
-*Validation status:* the steps on this page have not yet been checked on a live OpenShift 4.22 cluster.
-The images they use were checked to start and run as a non-root user in October 2026.
+*Validation status:* the steps on this page were run on a single-node OpenShift 4.21 cluster on 15 October 2026, and have not yet been run on 4.22.
+The cordon, drain and uncordon steps were not run, because that cluster has only one node.
 ====
 
 *Time:* 40 minutes
@@ -181,7 +181,7 @@ oc apply \
   --filename {d0-examples}/d0-broken-apps.yaml
 ----
 
-OpenShift prints a warning about `broken-root` as it accepts the file.
+OpenShift prints a Pod Security warning as it accepts the file, just before the line for `broken-root`: something in it wants to run as `runAsUser=0`.
 Keep it in mind.
 
 None of the four becomes ready:
@@ -211,7 +211,7 @@ oc describe pod \
   --selector app=broken-image
 ----
 
-The tag doesn't exist.
+Look for `manifest unknown` in the `Failed` events: the registry has no image with that tag.
 The fix is the correct image name or tag, or pull credentials if the registry is private.
 
 === broken-crash
