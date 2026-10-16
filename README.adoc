@@ -76,5 +76,6 @@ Then write its pages, fill in its row on the instructor page and its setup requi
 
 Run the *Release* workflow from the Actions tab with the next version, such as `v1.1.0`, or push a tag of that name.
 It publishes the PDF, the runtime and tools images, the Helm chart and an offline bundle; see "Releases" in workshop-common's README.
+To ship another file with every release, put it in `downloads/`.
 The tools image has only the shared tools; `tools/install.sh` adds none.
 The one other command-line tool the pages use, `podman`, runs on an attendee's workstation or the instructor's Linux host, because the tools pod has no container engine.
