@@ -34,8 +34,6 @@ runtime:
 antora:
   extensions:
     - '@antora/pdf-extension'
-    - require: ./content/lib/dev-mode.js
-      enabled: false
 
 output:
   dir: ./www
