@@ -5,7 +5,7 @@ Now that we've established some "ground rules" on "fair behavior" in the platfor
 [NOTE]
 ====
 The source code referenced in this page is available in the top-right "Links" section. +
-It's also available https://github.com/shpwrck/retail-store-sample-app[here].
+It's also available https://github.com/redhat-na-ssa/retail-store-sample-app[here].
 ====
 
 == Container Basics
@@ -133,7 +133,7 @@ Assuming that the architecture of your own build environment is the same as your
 oc create imagestream cart
 oc create build cart \
   --strategy Docker \
-  --source-git=https://github.com/shpwrck/retail-store-sample-app \
+  --source-git=https://github.com/redhat-na-ssa/retail-store-sample-app \
   --context-dir=./src/cart \
   --dockerfile-path=. \
   --to-image-stream cart:0.0.1
@@ -148,7 +148,7 @@ If you run the `oc create build` command again, it will fail (by design). We nee
 .Build Repeatably 
 [source,sh,role=execute]
 ----
-oc new-build https://github.com/shpwrck/retail-store-sample-app \
+oc new-build https://github.com/redhat-na-ssa/retail-store-sample-app \
   --strategy docker \
   --context-dir=./src/cart \
   --to cart:0.0.1
@@ -185,7 +185,7 @@ The next step after accomplishing reliable/repeatable builds is deployment. We c
 .Create a new build and a running 'Deployment'
 [source,sh,role=execute]
 ----
-oc new-app https://github.com/shpwrck/retail-store-sample-app \
+oc new-app https://github.com/redhat-na-ssa/retail-store-sample-app \
   --name test-cart \
   --context-dir ./src/cart
 ----
@@ -247,7 +247,7 @@ rm -r templates/*
 ----
 # Add "-o yaml" to our previous "new-app" command and dump it
 # to a file
-oc new-app https://github.com/shpwrck/retail-store-sample-app \
+oc new-app https://github.com/redhat-na-ssa/retail-store-sample-app \
   --name test-cart \
   --context-dir ./src/cart \
   -o yaml \

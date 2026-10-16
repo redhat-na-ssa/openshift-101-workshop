@@ -1,4 +1,4 @@
 = OpenShift Primer Workshop Repo
 
-https://dev.workshop.k8socp.com[Workshop Link]
+https://redhat-na-ssa.github.io/openshift-101-workshop/[Workshop Link]
 

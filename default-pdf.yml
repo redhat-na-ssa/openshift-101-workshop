@@ -1,7 +1,7 @@
 ---
 site:
   title: OpenShift Primer
-  url: https://dev.workshop.k8socp.com
+  url: "https://redhat-na-ssa.github.io/openshift-101-workshop"
   start_page: modules::index.adoc
 
 content:
