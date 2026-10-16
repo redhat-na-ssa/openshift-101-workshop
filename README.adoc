@@ -1,11 +1,44 @@
-= OpenShift Primer Workshop Repo
+= OpenShift 101 Workshop
 
-https://redhat-na-ssa.github.io/openshift-101-workshop/[Workshop Link]
+This repo holds the OpenShift 101 Workshop site: three workshops that take attendees from containers and Kubernetes basics to building, running and troubleshooting applications on OpenShift.
+Attendees and instructors use the site, https://redhat-na-ssa.github.io/openshift-101-workshop/[redhat-na-ssa.github.io/openshift-101-workshop]: its *Workshop instructor* page has what an instructor needs to run a delivery, and its *Workshop attendee* page is where attendees start.
+This README is for the people who maintain the workshops.
 
+The site look, the PDF look and the build workflows come from https://github.com/shpwrck/workshop-common[workshop-common], which the other workshop repos share, so change those there.
 
-The site's look (theme, CSS, tabs, copy buttons, footer), the PDF look and the Pages and PDF workflows come from https://github.com/shpwrck/workshop-common[workshop-common], which the other workshop repos share; change them there.
+== Layout
 
-To preview the site, clone https://github.com/shpwrck/workshop-common[workshop-common] next to this repository and run this from this repository's folder:
+The site is one Antora component, so a single navigation spans every workshop.
+
+[cols="1,2",options="header"]
+|===
+|Path |What it holds
+
+|`content/`
+|The home part: the Workshop home, Workshop instructor and Workshop attendee pages, and the `antora.yml` whose title, navigation and attributes the whole site uses.
+
+|`workshops/containers-for-vmware-admins/`
+|Containers and Kubernetes for VMware Admins.
+
+|`workshops/openshift-fundamentals/`
+|OpenShift Fundamentals.
+
+|`workshops/running-applications/`
+|Running Applications.
+
+|`content/lib/dev-mode.js`
+|An Antora extension that lists the site's attributes on an extra page. It is turned off in both playbooks.
+
+|`deploy/`
+|Helm values for running the site with a terminal and a web console in Showroom.
+|===
+
+Each workshop folder holds its own `antora.yml`, which applies only when the workshop is built alone, and its pages, navigation, images and examples under `modules/NAME/`.
+An attribute a workshop needs must also be in `content/antora.yml`, because in the full site that file's attributes replace the workshop's.
+
+== Previewing
+
+With https://github.com/shpwrck/workshop-common[workshop-common] checked out next to this repo, run this from this repo's folder to preview the whole site:
 
 [source,bash]
 ----
@@ -13,3 +46,32 @@ To preview the site, clone https://github.com/shpwrck/workshop-common[workshop-c
 ----
 
 It builds the site the way the Pages workflow does, serves it on http://localhost:8080/ and rebuilds it when you save a change.
+It needs Node.js and Python 3.
+
+To build one workshop on its own, the way it is tested before it joins the site:
+
+[source,bash]
+----
+../workshop-common/scripts/preview.sh \
+  --watch \
+  --workshop openshift-fundamentals
+----
+
+Every pull request runs *Check content*, which holds the lines it changes to the formatting conventions and checks that the site and each workshop on its own build without warnings or broken links, and *Test PDF Build*.
+A merge to `main` publishes the site.
+
+== Adding a Workshop
+
+From this repo's folder:
+
+[source,bash]
+----
+../workshop-common/scripts/add-workshop.py NAME "Title"
+----
+
+It creates `workshops/NAME` from the workshop template and lists it in both playbooks, in `content/antora.yml` and on the home, instructor and attendee pages.
+Then write its pages, fill in its row on the instructor page and its setup requirements.
+
+== Releases
+
+To publish a release with its PDF, run the *Build and Release PDF Documentation* workflow from the Actions tab with the next version, such as `v1.0.0`, or push a tag of that name.

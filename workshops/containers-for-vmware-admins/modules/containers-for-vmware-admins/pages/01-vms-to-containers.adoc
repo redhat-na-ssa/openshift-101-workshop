@@ -9,7 +9,7 @@ The OpenShift steps were run on a single-node OpenShift 4.21 cluster on 15 Octob
 *Time:* 60 minutes
 
 You already know how a hypervisor shares a physical server between virtual machines.
-This module shows how containers share a server in a different way, and why that difference shapes everything that follows today.
+This module shows how containers share a server in a different way, and why that difference shapes everything that follows in this workshop.
 
 .In this module
 * <<two-ways>>
@@ -260,7 +260,7 @@ podman rm --force web
 
 === Part 2: A container on OpenShift (Everyone)
 
-You can follow this part with `oc`, after logging in as described in xref:d0-00-agenda.adoc[the Day Zero agenda].
+You can follow this part with `oc`, after logging in as described in xref:index.adoc#log-in[Log in from the command line].
 
 Look at the same image's layers straight from the registry, without downloading it:
 
@@ -277,19 +277,19 @@ Run it again in a few weeks and the digest for `latest` will probably have chang
 Start a pod from that image with a CPU limit of a quarter of a core and a memory limit of 128 MiB.
 This is the file you are about to apply:
 
-.d0-toolbox-pod.yaml
+.toolbox-pod.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-toolbox-pod.yaml[]
+include::example$toolbox-pod.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-toolbox-pod.yaml
+  --filename {vmware-admins-examples}/toolbox-pod.yaml
 ----
 
 Wait for it to be ready:

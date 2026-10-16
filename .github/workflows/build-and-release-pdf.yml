@@ -20,4 +20,4 @@ jobs:
     with:
       tag-name: ${{ github.event_name == 'push' && github.ref_name || inputs.tag_name }}
       pdf-name: openshift-101-workshop
-      pdf-title: OpenShift Primer
+      pdf-title: "OpenShift 101 Workshop"

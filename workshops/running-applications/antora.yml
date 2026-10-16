@@ -1,0 +1,18 @@
+# Used only when this workshop is built alone (preview.sh --workshop running-applications):
+# in the full site, content/antora.yml provides the title, nav and attributes.
+name: ROOT
+title: "Running Applications"
+version: ~
+nav:
+  - modules/running-applications/nav.adoc
+
+asciidoc:
+  attributes:
+    lab_name: "Running Applications"
+    page-pagination: true
+    tabs-sync-option: ''
+    page-links:
+    - url: https://github.com/redhat-na-ssa/retail-store-sample-app
+      text: Application Source Repository
+    - url: https://github.com/rhobs/prometheus-example-app
+      text: Prometheus Example Source Repository

@@ -1,73 +1,26 @@
-= OpenShift Primer
+= OpenShift 101 Workshop
 
-== Welcome
+This workshop is for developers, DevOps engineers and IT professionals who are getting started with OpenShift or want to sharpen their application development skills on it, and for infrastructure and VMware administrators who are new to containers.
+By the end, you can build, deploy, expose, configure, scale and troubleshoot applications on OpenShift, from both the web console and the `oc` command line.
 
-Welcome to the OpenShift Application Development Workshop!
+== Where to Start
 
-Over the next two days, we’ll dive deep into building, deploying, and managing applications on OpenShift. Whether you're new to OpenShift or looking to sharpen your skills, this workshop will provide hands-on experience and practical knowledge that you can apply right away.
+[cols="1,2",options="header"]
+|===
+|You are |Start here
 
-=== Workshop Goals
-1. Understand the fundamentals of OpenShift and its core components.
-2. Learn how to develop, containerize, and deploy applications efficiently.
-3. Explore best practices for application scaling.
-4. Gain hands-on experience with troubleshooting and maintaining applications in an OpenShift environment.
+|Running a delivery of the workshop
+|xref:instructor.adoc[Workshop instructor]: what the workshop covers, the environment it needs, and how to run it.
 
-=== Workshop Environment
+|Taking the workshop
+|xref:attendee.adoc[Workshop attendee]: how the workshop works and where to begin.
+|===
 
-To facilitate hands-on learning, this workshop provides the following tools:
+== Included Workshops
 
-* **A Terminal for CLI Testing**: Direct access to the OpenShift command-line interface (CLI) for efficient management and control of your applications.
-* **A Web Console for Visual Interaction**: A user-friendly graphical interface to explore OpenShift projects, resources, and configurations.
+Each one stands on its own; run them in the order listed or pick the ones your group needs.
 
-
-These tools ensure a smooth and flexible experience, allowing you to interact with OpenShift both visually and through the command line while coding directly within the environment.
-
-=== Agenda
-
-.**Day 0** (optional, for newcomers)
-* **Container & OpenShift Fundamentals**: +
-A one-day introduction for infrastructure and VMware administrators with no container background: containers, Kubernetes building blocks, what OpenShift adds, configuration, storage, networking and troubleshooting. See the xref:d0-00-agenda.adoc[Day Zero agenda].
-
-.**Day 1**
-* **Background**: +
-Why you might use OpenShift for application development.
-* **What is OpenShift?**: +
-Components used to run OpenShift
-* **OpenShift vs Kubernetes**: +
-How OpenShift and Kubernetes differ. 
-* **CLI and Web Console**: +
-OpenShift's most common interfaces.
-* **Projects**: +
-OpenShift's workspace resource.
-* **Application Deployment**: +
-How to create an application image from source code and package it for OpenShift 
-* **OpenShift Networking**: +
-Configuration options for exposing application traffic.
-
-.**Day 2**
-* **Container Lifecycle**: +
-Handling the image artifact in and out of the OpenShift cluster
-* **Managing Configuration**: +
-Parameterizing applications with dynamic information
-* **Observability**: +
-Monitoring your application metrics and logs with OpenShift
-* **Scaling Applications**: +
-Leveraging OpenShift's robust scaling capabilities
-* **Debugging Applications**: +
-Common workflows for identifying failure scenarios and fixes
-* **Deployment Strategies**: +
-Workloads beyond basic deployments
-
-=== Who Should Attend
-
-This workshop is designed for developers, DevOps engineers, and IT professionals who are either getting started with OpenShift or looking to enhance their application development skills on the platform.
-
-Day Zero is designed for infrastructure and VMware administrators who are new to containers, Kubernetes and OpenShift. It can run on its own, or as preparation for Days One and Two.
-
-Everything the instructor needs to prepare is in xref:setup-requirements.adoc[Setup Requirements].
-
-=== Conclusion
-
-By the end of the workshop, you’ll walk away with a solid foundation in OpenShift application development and practical skills to accelerate your projects.
-
-Let’s get started!
+* xref:containers-for-vmware-admins:index.adoc[Containers and Kubernetes for VMware Admins]: what containers, Kubernetes and OpenShift are, for infrastructure and VMware administrators who are new to them.
+* xref:openshift-fundamentals:index.adoc[OpenShift Fundamentals]: how OpenShift differs from Kubernetes, and how to build, deploy and expose an application on it.
+* xref:running-applications:index.adoc[Running Applications]: managing images and configuration, observing, scaling and debugging applications, and deployment strategies.
+// add-workshop.py adds workshops above this line

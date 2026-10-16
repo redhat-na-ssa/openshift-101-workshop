@@ -97,7 +97,7 @@ Declarative::
 A YAML file that describes the whole object, applied with `oc apply`.
 The file can be reviewed, versioned in Git, and applied again to get the same result.
 
-On Day Zero, the goal is to _read_ YAML, not write it.
+In this workshop, the goal is to _read_ YAML, not write it.
 Every manifest has the same four top-level fields:
 
 [source,yaml]
@@ -124,19 +124,19 @@ It uses a small web server that replies with the name of the pod that answered, 
 This Deployment asks for three copies.
 Notice the selector and the labels in the pod template:
 
-.d0-web-deployment.yaml
+.web-deployment.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-web-deployment.yaml[]
+include::example$web-deployment.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-web-deployment.yaml
+  --filename {vmware-admins-examples}/web-deployment.yaml
 ----
 
 See the chain the Deployment created: one Deployment, one ReplicaSet, three pods.
@@ -160,19 +160,19 @@ oc get pods \
 
 === Put a Service in front
 
-.d0-web-service.yaml
+.web-service.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-web-service.yaml[]
+include::example$web-service.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-web-service.yaml
+  --filename {vmware-admins-examples}/web-service.yaml
 ----
 
 The `Endpoints` line lists the addresses of the pods the Service found through its selector:
@@ -293,7 +293,7 @@ Apply it again:
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-web-deployment.yaml
+  --filename {vmware-admins-examples}/web-deployment.yaml
 ----
 
 [source,sh,role=execute]

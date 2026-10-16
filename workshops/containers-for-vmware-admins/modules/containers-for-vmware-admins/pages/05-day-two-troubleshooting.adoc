@@ -39,7 +39,7 @@ Remember that nothing is live-migrated: draining replaces pods, so applications 
 Upgrades::
 OpenShift upgrades are requested from the console or with `oc adm upgrade`.
 The cluster then updates its control plane, its Operators and finally its nodes, one node at a time, through the Machine Config Operator.
-Planning upgrades is a Day One and Day Two topic; on Day Zero it's enough to know that the cluster does the rolling for you.
+Planning upgrades is beyond this workshop; here it's enough to know that the cluster does the rolling for you.
 
 [#oc-kubectl]
 == `oc` and `kubectl`
@@ -178,7 +178,7 @@ Don't read it yet: diagnose them from what the cluster tells you.
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-broken-apps.yaml
+  --filename {vmware-admins-examples}/broken-apps.yaml
 ----
 
 OpenShift prints a Pod Security warning as it accepts the file, just before the line for `broken-root`: something in it wants to run as `runAsUser=0`.
@@ -291,10 +291,10 @@ Delete the broken applications:
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc delete \
-  --filename {d0-examples}/d0-broken-apps.yaml
+  --filename {vmware-admins-examples}/broken-apps.yaml
 ----
 
-To remove everything Day Zero created in your project, including the database's volume:
+To remove everything this workshop created in your project, including the database's volume:
 
 [source,sh,role=execute]
 ----
@@ -320,7 +320,9 @@ oc delete pod toolbox
 [#next-steps]
 == Where to Keep Learning
 
-* xref:00-day-one-agenda.adoc[Day One] of this workshop: deploying and exposing applications on OpenShift in depth.
+ifdef::full-site[]
+* xref:openshift-fundamentals:index.adoc[OpenShift Fundamentals], the next workshop on this site: deploying and exposing applications on OpenShift in depth.
+endif::[]
 * https://developers.redhat.com/developer-sandbox[Red Hat Developer Sandbox]: a free OpenShift project to keep practising in.
 * https://www.redhat.com/en/interactive-labs/openshift[Red Hat interactive labs for OpenShift]: short guided exercises in the browser.
 * Once you're comfortable, the OpenShift 102 workshops on https://redhat-na-ssa.github.io/openshift-102-workshop/deploy-workshop/index.html[pod scheduling], https://redhat-na-ssa.github.io/openshift-102-workshop/helm-workshop/index.html[Helm], https://redhat-na-ssa.github.io/openshift-102-workshop/prometheus-workshop/index.html[Prometheus queries] and https://redhat-na-ssa.github.io/openshift-102-workshop/istio-workshop/index.html[service mesh], and the https://redhat-na-ssa.github.io/ocp-cloud-workshop/[OpenShift on AWS and Azure] workshop.

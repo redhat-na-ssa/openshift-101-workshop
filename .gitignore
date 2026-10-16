@@ -8,6 +8,10 @@ node_modules/
 www/
 .cache/
 
+# Playbooks the workshop-common scripts write while building one workshop alone
+.preview-playbook.yml
+.standalone*.yml
+
 # Ignore IDE and editor files
 .vscode/
 .idea/

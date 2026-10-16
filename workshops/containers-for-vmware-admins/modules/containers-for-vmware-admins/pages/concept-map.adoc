@@ -1,7 +1,7 @@
 = Concept Map: vSphere to OpenShift
 
 Many ideas in OpenShift have a rough counterpart in vSphere.
-This table is the only place Day Zero compares the two, and it is a map, not a translation: the third column matters as much as the first two.
+This table is the only place this workshop compares the two, and it is a map, not a translation: the third column matters as much as the first two.
 Each vSphere entry links to the Broadcom documentation it is based on (vSphere 8.0 and NSX 4.0).
 
 [cols="2,2,4",options="header"]
@@ -9,19 +9,19 @@ Each vSphere entry links to the Broadcom documentation it is based on (vSphere 8
 |In vSphere |Closest idea in OpenShift |Where the comparison breaks
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-virtual-machine-administration/deploying-virtual-machinesvsphere-vm-admin/clone-a-virtual-machine-to-a-template-h5vsphere-vm-admin.html[VM template]
-|Container image (xref:d0-01-vms-to-containers.adoc[Module 1])
+|Container image (xref:01-vms-to-containers.adoc[Module 1])
 |An image holds no kernel and boots no operating system. It packages one application and its files, and you never customize a container after it starts: you build a new image instead.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-virtual-machine-administration/using-content-librariesvsphere-vm-admin.html[Content library]
-|Container registry (xref:d0-01-vms-to-containers.adoc[Module 1])
+|Container registry (xref:01-vms-to-containers.adoc[Module 1])
 |Every node pulls images from the registry on demand. An image is identified by its digest; a tag such as `latest` is a label that can be moved to a different image.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-availability/creating-and-using-vsphere-ha-clusters/how-vsphere-ha-works.html[vSphere HA]
-|A Deployment replacing failed pods (xref:d0-02-kubernetes-building-blocks.adoc[Module 2])
+|A Deployment replacing failed pods (xref:02-kubernetes-building-blocks.adoc[Module 2])
 |HA restarts the same VM on another host after a host fails. Kubernetes creates a brand-new pod, with a new name and address, and it also reacts when the application itself crashes.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-resource-management/creating-a-drs-cluster.html[DRS]
-|The scheduler (xref:d0-02-kubernetes-building-blocks.adoc[Module 2])
+|The scheduler (xref:02-kubernetes-building-blocks.adoc[Module 2])
 |The scheduler picks a node when a pod is created and never moves a running pod. Rebalancing means replacing pods.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vcenter-and-host-management/migrating-virtual-machines-host-management/migration-with-vmotion-host-management.html[vMotion]
@@ -29,35 +29,35 @@ Each vSphere entry links to the Broadcom documentation it is based on (vSphere 8
 |A running container is never moved to another node. It is stopped and replaced, so applications are expected to handle that.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-resource-management/managing-resource-pools.html[Resource pools]
-|Requests, limits and ResourceQuotas (xref:d0-01-vms-to-containers.adoc[Module 1], xref:d0-05-day-two-troubleshooting.adoc[Module 5])
+|Requests, limits and ResourceQuotas (xref:01-vms-to-containers.adoc[Module 1], xref:05-day-two-troubleshooting.adoc[Module 5])
 |Requests and limits are set per container and decide where a pod can run. Going over a CPU limit slows the container down; going over a memory limit stops it. A ResourceQuota caps the total for a whole project.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-resource-management/using-drs-clusters-to-manage-resources/removing-hosts-from-a-cluster/place-a-host-in-maintenance-mode.html[Maintenance mode]
-|Cordon and drain (xref:d0-05-day-two-troubleshooting.adoc[Module 5])
+|Cordon and drain (xref:05-day-two-troubleshooting.adoc[Module 5])
 |Draining a node evicts its pods, and their Deployments create replacements on other nodes. Nothing is migrated while it runs.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/host-profiles/what-are-vsphere-host-profiles.html[Host profiles]
-|MachineConfigs (xref:d0-03-what-openshift-adds.adoc[Module 3])
+|MachineConfigs (xref:03-what-openshift-adds.adoc[Module 3])
 |The Machine Config Operator applies node configuration continuously, and most changes reboot the nodes one at a time. You don't log in to a node to change it.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-storage/working-with-datastores-in-vsphere-storage-environment.html[Datastore]
-|The storage behind a PersistentVolume (xref:d0-04-config-storage-networking.adoc[Module 4])
+|The storage behind a PersistentVolume (xref:04-config-storage-networking.adoc[Module 4])
 |Applications never pick a datastore. They ask for an amount of storage with a PersistentVolumeClaim, and the platform creates a volume to match.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-storage/storage-policy-based-management-in-vsphere.html[VM storage policies]
-|StorageClass (xref:d0-04-config-storage-networking.adoc[Module 4])
+|StorageClass (xref:04-config-storage-networking.adoc[Module 4])
 |A StorageClass names a CSI driver and its settings. A claim either names a class or gets the cluster's default one.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-networking/basic-networking-with-vnetwork-distributed-switches.html[Distributed switch and port groups]
-|The pod network, OVN-Kubernetes (xref:d0-04-config-storage-networking.adoc[Module 4])
+|The pod network, OVN-Kubernetes (xref:04-config-storage-networking.adoc[Module 4])
 |Every pod gets an address on one cluster-wide network, with no VLAN per application. Pod addresses change all the time, so Services provide the stable names and addresses.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/vsphere-security/vsphere-permissions-and-user-management-tasks/understanding-authorization-in-vsphere.html[vCenter roles and permissions]
-|RBAC roles and role bindings (xref:d0-03-what-openshift-adds.adoc[Module 3])
+|RBAC roles and role bindings (xref:03-what-openshift-adds.adoc[Module 3])
 |A role lists actions on kinds of objects, and a role binding grants it to a user, group or service account in one project, or across the whole cluster. There is no inventory tree.
 
 |https://techdocs.broadcom.com/us/en/vmware-cis/nsx/vmware-nsx/4-0/security-quick-start-guide/NSX-Security-Overview=GUID-81388763-21D0-48DA-820B-B366FB098D29=3=en=.html[NSX distributed firewall]
-|NetworkPolicy (xref:d0-04-config-storage-networking.adoc[Module 4])
+|NetworkPolicy (xref:04-config-storage-networking.adoc[Module 4])
 |All traffic between pods is allowed until a policy selects a pod. A NetworkPolicy only allows traffic, and once any policy selects a pod, everything not allowed is blocked.
 |===
 

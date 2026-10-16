@@ -1,0 +1,16 @@
+# Used only when this workshop is built alone (preview.sh --workshop openshift-fundamentals):
+# in the full site, content/antora.yml provides the title, nav and attributes.
+name: ROOT
+title: "OpenShift Fundamentals"
+version: ~
+nav:
+  - modules/openshift-fundamentals/nav.adoc
+
+asciidoc:
+  attributes:
+    lab_name: "OpenShift Fundamentals"
+    page-pagination: true
+    tabs-sync-option: ''
+    page-links:
+    - url: https://github.com/redhat-na-ssa/retail-store-sample-app
+      text: Application Source Repository

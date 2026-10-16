@@ -1,0 +1,130 @@
+= Workshop Instructor
+
+This page is for the instructor who runs a delivery of the workshop.
+
+== What the Workshop Covers
+
+OpenShift Fundamentals and Running Applications are for developers, DevOps engineers and IT professionals who are getting started with OpenShift or want to sharpen their application development skills on it.
+Containers and Kubernetes for VMware Admins is for infrastructure and VMware administrators who are new to containers, Kubernetes and OpenShift; it can run on its own, or as preparation for the other two.
+
+Together, the workshops aim to:
+
+. Explain the fundamentals of OpenShift and its core components.
+. Show how to develop, containerize, and deploy applications efficiently.
+. Explore best practices for application scaling.
+. Give hands-on experience with troubleshooting and maintaining applications in an OpenShift environment.
+
+[cols="2,3,1",options="header"]
+|===
+|Workshop |Covers |Time
+
+
+|xref:containers-for-vmware-admins:index.adoc[Containers and Kubernetes for VMware Admins]
+|Containers, Kubernetes building blocks, what OpenShift adds, configuration, storage, networking and first troubleshooting steps, for administrators with no container background. Demo-led, no coding.
+|One day: 285 minutes of modules, plus the concept map, breaks and lunch
+
+|xref:openshift-fundamentals:index.adoc[OpenShift Fundamentals]
+|OpenShift's components and how they differ from Kubernetes, the web console and `oc`, projects and RBAC, building and deploying an application from source, and Routes.
+|One day
+
+|xref:running-applications:index.adoc[Running Applications]
+|Images on the cluster, configuration, observability, scaling, debugging and deployment strategies.
+|One day
+// add-workshop.py adds workshops above this line
+|===
+
+// TODO(Jason): OpenShift Fundamentals and Running Applications have no per-module timings;
+// each ran as one full day in the original two-day agenda. Add the module times if you have them.
+
+== Environment and Requirements
+
+Each workshop lists the cluster components, Operators, command-line tools, roles and access it needs on its own page.
+Prepare everything for the workshops you deliver:
+
+* xref:containers-for-vmware-admins:setup-requirements.adoc[Containers and Kubernetes for VMware Admins]
+* xref:openshift-fundamentals:setup-requirements.adoc[OpenShift Fundamentals]
+* xref:running-applications:setup-requirements.adoc[Running Applications]
+// add-workshop.py adds workshops above this line
+
+Every workshop needs:
+
+* an OpenShift cluster, with a user account for each attendee
+* a terminal with the `oc` command-line tool, matching the cluster version, for the command-line steps
+* a current web browser, for the OpenShift web console
+
+The workshop environment can provide the terminal and the web console side by side with the pages: `deploy/single-pod-values.yaml` in the repository holds the Helm values for running the site with a terminal and a console in Showroom.
+
+== Suggested Delivery Orders
+
+The workshops build on each other in the order listed, and each one stands on its own.
+
+Half day::
+// TODO(Jason): no workshop is timed for a half day. From the module times, the concept map and
+// Modules 1 to 3 of Containers and Kubernetes for VMware Admins take about 200 minutes plus a break.
+// Confirm that, or name the OpenShift Fundamentals pages that fit.
+The concept map and Modules 1 to 3 of Containers and Kubernetes for VMware Admins.
+
+One day::
+Containers and Kubernetes for VMware Admins, for administrators new to containers.
+For developers who already know containers, OpenShift Fundamentals.
+
+Two days::
+OpenShift Fundamentals, then Running Applications.
+For administrators new to containers, Containers and Kubernetes for VMware Admins, then OpenShift Fundamentals.
+
+Three days::
+All three workshops, in the order listed.
+
+== Before the Day
+
+. Prepare the environment from the setup requirements above, for every attendee.
+. Run the workshop end to end once on an environment built the same way.
+. Send attendees the xref:attendee.adoc[Workshop attendee] page so they can check their workstation.
+
+== Delivery Notes
+
+=== Containers and Kubernetes for VMware Admins
+
+The workshop is built for a virtual classroom: short talks, live demos, and Q&A at the end of every module.
+The instructor runs every demo, and attendees with cluster access follow along in their own project.
+Steps marked *Instructor only* need administrator rights or a Linux machine.
+
+A one-day delivery runs on this schedule:
+
+[cols="1,3",options="header"]
+|===
+|Time |Session
+
+|9:00 to 9:10 AM
+|Welcome, and the xref:containers-for-vmware-admins:concept-map.adoc[concept map] that ties the day together
+
+|9:10 to 10:10 AM
+|xref:containers-for-vmware-admins:01-vms-to-containers.adoc[Module 1: From Virtual Machines to Containers]
+
+|10:10 to 10:20 AM
+|Break
+
+|10:20 to 11:20 AM
+|xref:containers-for-vmware-admins:02-kubernetes-building-blocks.adoc[Module 2: Kubernetes Building Blocks]
+
+|11:20 AM to 12:05 PM
+|Lunch
+
+|12:05 to 1:15 PM
+|xref:containers-for-vmware-admins:03-what-openshift-adds.adoc[Module 3: What OpenShift Adds]
+
+|1:15 to 2:10 PM
+|xref:containers-for-vmware-admins:04-config-storage-networking.adoc[Module 4: Configuration, Storage and Networking]
+
+|2:10 to 2:20 PM
+|Break
+
+|2:20 to 3:00 PM
+|xref:containers-for-vmware-admins:05-day-two-troubleshooting.adoc[Module 5: Day-2 Basics and Troubleshooting]
+|===
+
+=== OpenShift Fundamentals and Running Applications
+
+Attendees work through the pages with the terminal and the web console, and most pages end with a knowledge check to discuss.
+
+// TODO(Jason): timings, pauses, common mistakes and how to recover from them.

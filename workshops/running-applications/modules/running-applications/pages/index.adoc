@@ -1,15 +1,13 @@
-= Day Two Agenda
+= Running Applications
 
-* xref:11-container-lifecycle.adoc[Container Lifecycle]
-* xref:12-managing-configuration.adoc[Managing Configuration]
-* xref:13-observability.adoc[Observability]
-* xref:14-scaling-applications.adoc[Scaling Applications]
-* xref:15-debugging-applications.adoc[Debugging Applications]
-* xref:16-deployment-strategies.adoc[Deployment Strategies]
+This workshop covers what it takes to run applications on OpenShift once they are deployed: managing images, configuration, observability, scaling, debugging and deployment strategies.
+It follows on from the OpenShift Fundamentals workshop.
+
+Before you start, make sure your environment meets the xref:setup-requirements.adoc[Setup Requirements].
 
 == Outcomes
 
-By the end of day two, participants will have expanded their operational understanding of OpenShift and gained experience with advanced platform capabilities. The following learning outcomes are expected:
+By the end of this workshop, participants will have expanded their operational understanding of OpenShift and gained experience with advanced platform capabilities. The following learning outcomes are expected:
 
 * **Manage Image Artifacts Inside and Outside of a Cluster**: +
 Learn how to work with container images using internal OpenShift image registries as well as external registries, and understand how image policies impact builds and deployments.
@@ -29,4 +27,11 @@ Leverage OpenShift’s built-in debugging capabilities—such as remote shell ac
 * **Understand the Different Workload Strategies for Applications**: +
 Learn how OpenShift helps manage modern deployment strategies like Canary Rollouts, Blue/Green Deployments, and A/B Testing.
 
-xref:00-day-one-agenda.adoc[Jump to Day One]
+== Modules
+
+. xref:01-container-lifecycle.adoc[Container Lifecycle]: handling the image artifact in and out of the OpenShift cluster.
+. xref:02-managing-configuration.adoc[Managing Configuration]: parameterizing applications with dynamic information.
+. xref:03-observability.adoc[Observability]: monitoring your application metrics and logs with OpenShift.
+. xref:04-scaling-applications.adoc[Scaling Applications]: leveraging OpenShift's robust scaling capabilities.
+. xref:05-debugging-applications.adoc[Debugging Applications]: common workflows for identifying failure scenarios and fixes.
+. xref:06-deployment-strategies.adoc[Deployment Strategies]: workloads beyond basic deployments.

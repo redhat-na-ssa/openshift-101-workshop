@@ -1,0 +1,16 @@
+# Used only when this workshop is built alone (preview.sh --workshop containers-for-vmware-admins):
+# in the full site, content/antora.yml provides the title, nav and attributes.
+name: ROOT
+title: "Containers and Kubernetes for VMware Admins"
+version: ~
+nav:
+  - modules/containers-for-vmware-admins/nav.adoc
+
+asciidoc:
+  attributes:
+    lab_name: "Containers and Kubernetes for VMware Admins"
+    page-pagination: true
+    tabs-sync-option: ''
+    # The raw files that the pages apply
+    vmware-admins-examples: https://raw.githubusercontent.com/redhat-na-ssa/openshift-101-workshop/main/workshops/containers-for-vmware-admins/modules/containers-for-vmware-admins/examples
+    page-links: []
