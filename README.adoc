@@ -3,4 +3,4 @@
 https://redhat-na-ssa.github.io/openshift-101-workshop/[Workshop Link]
 
 
-The site's look (theme, CSS, tabs, copy buttons, footer) and the Pages and PDF workflows come from https://github.com/redhat-na-ssa/workshop-common[workshop-common], which the other workshop repos share; change them there.
+The site's look (theme, CSS, tabs, copy buttons, footer) and the Pages and PDF workflows come from https://github.com/shpwrck/workshop-common[workshop-common], which the other workshop repos share; change them there.
