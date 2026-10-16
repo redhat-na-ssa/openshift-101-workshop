@@ -1,11 +1,9 @@
-= Setup Requirements
+= Containers and Kubernetes for VMware Admins: Setup Requirements
 
-This page lists everything needed to run Day Zero (Container & OpenShift Fundamentals).
+This page lists everything needed to run the Containers and Kubernetes for VMware Admins workshop.
 The instructor prepares the cluster ahead of time, and attendees only need the items under <<workstation>>.
 
-NOTE: Requirements for Days One and Two are not on this page yet.
-
-Day Zero is demo-led: the instructor runs every demo, and attendees who have cluster access can follow along in their own project.
+The workshop is demo-led: the instructor runs every demo, and attendees who have cluster access can follow along in their own project.
 One shared cluster serves the whole class.
 
 == Cluster
@@ -56,7 +54,7 @@ Create a group for the attendees, replacing the user names with real ones:
 
 [source,sh,role=execute]
 ----
-oc adm groups new day-zero-attendees \
+oc adm groups new vmware-admins-attendees \
   user1 \
   user2
 ----
@@ -66,20 +64,20 @@ Give the group read access to the whole cluster:
 [source,sh,role=execute]
 ----
 oc adm policy add-cluster-role-to-group cluster-reader \
-  day-zero-attendees
+  vmware-admins-attendees
 ----
 
 For each attendee, create a project and make them its administrator, replacing `USER` with the attendee's user name:
 
 [source,sh,role=execute]
 ----
-oc new-project day0-USER
+oc new-project vmware-admins-USER
 ----
 
 [source,sh,role=execute]
 ----
 oc adm policy add-role-to-user admin USER \
-  --namespace day0-USER
+  --namespace vmware-admins-USER
 ----
 
 == Instructor Workstation

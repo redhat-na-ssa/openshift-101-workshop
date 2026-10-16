@@ -34,7 +34,7 @@ regexes = [
   '''^cGFzc3dvcmQ=$''',
   # docker-registry pull secret example
   '''^mypassword$''',
-  # database password placeholder in the Day Zero Secret example
+  # database password placeholder in the VMware admins workshop's Secret example
   '''^change-me-later$''',
 ]
 

@@ -1,0 +1,27 @@
+= Workshop Attendee
+
+== How the Workshop Works
+
+Each workshop is a set of modules, one page each, and most pages end with a knowledge check: questions with the answer folded underneath.
+You work with OpenShift in two ways, and the workshop environment gives you both:
+
+* **A terminal for the command line**: the `oc` command-line tool, for managing your applications directly.
+* **The web console**: a graphical interface to explore OpenShift projects, resources, and configurations.
+
+Copy each command with the button on its code block.
+Replace the values in capitals or quotes, such as `"NAMESPACE"` or `REPLACE_WITH_YOUR_TOKEN`, with your own before you run it.
+
+Before you start, run the verification checklist at the end of your workshop's setup requirements, which the workshop's first page links to.
+
+== Workshops
+
+* xref:containers-for-vmware-admins:index.adoc[Containers and Kubernetes for VMware Admins]: containers, Kubernetes and OpenShift for infrastructure and VMware administrators who are new to them.
+* xref:openshift-fundamentals:index.adoc[OpenShift Fundamentals]: the web console and `oc`, projects, building and deploying an application, and Routes.
+* xref:running-applications:index.adoc[Running Applications]: images, configuration, observability, scaling, debugging and deployment strategies.
+// add-workshop.py adds workshops above this line
+
+== Where to Begin
+
+If you are new to containers and Kubernetes, begin with xref:containers-for-vmware-admins:index.adoc[Containers and Kubernetes for VMware Admins].
+Otherwise, begin with xref:openshift-fundamentals:index.adoc[OpenShift Fundamentals].
+If your instructor has set a different order, follow theirs.

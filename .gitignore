@@ -40,3 +40,10 @@ yarn.lock
 
 # Don't duplicate Assets
 build/assembler/modules/_images/
+
+# Release builds and local previews
+.offline-chart/
+.preview-playbook.yml
+.standalone-*.yml
+.standalone.yml
+.workshop-common/

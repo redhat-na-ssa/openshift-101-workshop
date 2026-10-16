@@ -1,48 +1,16 @@
-= Day Zero Agenda: Container & OpenShift Fundamentals
+= Containers and Kubernetes for VMware Admins
 
-Day Zero is a one-day introduction for infrastructure and VMware administrators who have never worked with containers, Kubernetes or OpenShift.
+This workshop is an introduction for infrastructure and VMware administrators who have never worked with containers, Kubernetes or OpenShift.
 It is built for a virtual classroom: short talks, live demos, and Q&A at the end of every module.
 No coding is required, and nobody is expected to memorize YAML.
 
-Days One and Two of this workshop go deeper and assume what Day Zero teaches.
+The OpenShift Fundamentals and Running Applications workshops go deeper and assume what this workshop teaches.
 
-== Schedule
-
-[cols="1,3",options="header"]
-|===
-|Time |Session
-
-|9:00 to 9:10 AM
-|Welcome, and the xref:d0-concept-map.adoc[concept map] that ties the day together
-
-|9:10 to 10:10 AM
-|xref:d0-01-vms-to-containers.adoc[Module 1: From Virtual Machines to Containers]
-
-|10:10 to 10:20 AM
-|Break
-
-|10:20 to 11:20 AM
-|xref:d0-02-kubernetes-building-blocks.adoc[Module 2: Kubernetes Building Blocks]
-
-|11:20 AM to 12:05 PM
-|Lunch
-
-|12:05 to 1:15 PM
-|xref:d0-03-what-openshift-adds.adoc[Module 3: What OpenShift Adds]
-
-|1:15 to 2:10 PM
-|xref:d0-04-config-storage-networking.adoc[Module 4: Configuration, Storage and Networking]
-
-|2:10 to 2:20 PM
-|Break
-
-|2:20 to 3:00 PM
-|xref:d0-05-day-two-troubleshooting.adoc[Module 5: Day-2 Basics and Troubleshooting]
-|===
+Before you start, make sure your environment meets the xref:setup-requirements.adoc[Setup Requirements].
 
 == Outcomes
 
-By the end of Day Zero, participants can:
+By the end of this workshop, participants can:
 
 * Explain what a container is at the operating system level, and why it is not a small virtual machine.
 * Describe the core Kubernetes objects (Pods, Deployments, Services, Namespaces) and how they keep an application running.
@@ -50,7 +18,16 @@ By the end of Day Zero, participants can:
 * Explain how applications get their settings, storage and network access.
 * Work through the first troubleshooting steps for an application that won't start.
 
-== How the demos work
+== Modules
+
+. xref:concept-map.adoc[Concept Map: vSphere to OpenShift]: the map that ties the workshop together.
+. xref:01-vms-to-containers.adoc[Module 1: From Virtual Machines to Containers]: how containers share a server, images and registries, and a container run on Linux and on OpenShift.
+. xref:02-kubernetes-building-blocks.adoc[Module 2: Kubernetes Building Blocks]: desired state, the core objects, labels and scheduling, and a Deployment that recovers on its own.
+. xref:03-what-openshift-adds.adoc[Module 3: What OpenShift Adds]: the web console, Operators, Projects and Routes, RBAC and SCCs, and a Source-to-Image build.
+. xref:04-config-storage-networking.adoc[Module 4: Configuration, Storage and Networking]: ConfigMaps and Secrets, persistent storage, and NetworkPolicies.
+. xref:05-day-two-troubleshooting.adoc[Module 5: Day-2 Basics and Troubleshooting]: the cluster from an administrator's side, and four broken applications to fix.
+
+== How the Demos Work
 
 The instructor runs every demo live.
 If you have access to the workshop cluster, you can run the same steps in your own project as the instructor goes.
@@ -59,6 +36,7 @@ Steps marked *Instructor only* need administrator rights or a Linux machine, so 
 Everything you need to follow along is in xref:setup-requirements.adoc[Setup Requirements].
 The short version: a web browser, and either the `oc` command-line tool on your computer or the web terminal in the OpenShift console.
 
+[#log-in]
 === Log in from the command line
 
 In the OpenShift web console, open the menu under your user name in the top right and choose *Copy login command*.
@@ -94,4 +72,4 @@ Every demo command runs in your current project, so check that it names your own
 The demos create objects from small YAML files.
 Each page shows the file it uses, and the commands read the same files straight from the workshop's repository, so there is nothing to download.
 
-xref:d0-01-vms-to-containers.adoc[Start Module 1]
+xref:concept-map.adoc[Start with the concept map]

@@ -277,7 +277,7 @@ And voila! You can take that example and run it in any OpenShift Cluster! There 
 * Provide some additional documentation as to how the application should operate.
 * Recreate meaningful tests
 
-This list could honestly go on for several dozen more bullet points, but this is just an MVP (not **PRODUCTION**). After we've completed both "Day 1" and "Day 2", I highly recommend returning to helm, workloads, and builds to explore what was originally out of scope.
+This list could honestly go on for several dozen more bullet points, but this is just an MVP (not **PRODUCTION**). After we've completed both this workshop and Running Applications, I highly recommend returning to helm, workloads, and builds to explore what was originally out of scope.
 
 == References
 

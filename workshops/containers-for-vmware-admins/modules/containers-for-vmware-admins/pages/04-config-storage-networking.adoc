@@ -105,19 +105,19 @@ oc create configmap site-content \
 
 Deploy a web server that mounts it as its web root:
 
-.d0-site.yaml
+.site.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-site.yaml[]
+include::example$site.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-site.yaml
+  --filename {vmware-admins-examples}/site.yaml
 ----
 
 [source,sh,role=execute]
@@ -182,19 +182,19 @@ oc extract secret/db-credentials \
 Deploy PostgreSQL with a 1 GiB claim.
 The Deployment reads its user name and password from the Secret, and mounts the claim where PostgreSQL keeps its data:
 
-.d0-database.yaml
+.database.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-database.yaml[]
+include::example$database.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-database.yaml
+  --filename {vmware-admins-examples}/database.yaml
 ----
 
 Check the claim.
@@ -273,19 +273,19 @@ oc exec toolbox -- curl --silent --max-time 5 http://web:8080/hostname
 
 Apply a policy that selects every pod in the project and allows nothing in:
 
-.d0-netpol-deny-all.yaml
+.netpol-deny-all.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-netpol-deny-all.yaml[]
+include::example$netpol-deny-all.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-netpol-deny-all.yaml
+  --filename {vmware-admins-examples}/netpol-deny-all.yaml
 ----
 
 Both requests now time out after five seconds:
@@ -327,19 +327,19 @@ The instructor checks this before the class and can skip the Route part of the d
 
 Allow the `toolbox` pod, and only it, to reach the `site` pods:
 
-.d0-netpol-allow-toolbox.yaml
+.netpol-allow-toolbox.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-netpol-allow-toolbox.yaml[]
+include::example$netpol-allow-toolbox.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-netpol-allow-toolbox.yaml
+  --filename {vmware-admins-examples}/netpol-allow-toolbox.yaml
 ----
 
 The `site` page loads again, but `web` stays blocked:
@@ -357,19 +357,19 @@ oc exec toolbox -- curl --silent --max-time 5 http://web:8080/hostname
 Allow traffic from the OpenShift router into the project, so Routes work again.
 The router's project carries a label that OpenShift provides for exactly this:
 
-.d0-netpol-allow-router.yaml
+.netpol-allow-router.yaml
 [%collapsible]
 ====
 [source,yaml]
 ----
-include::example$d0-netpol-allow-router.yaml[]
+include::example$netpol-allow-router.yaml[]
 ----
 ====
 
 [source,sh,role=execute,subs="attributes+"]
 ----
 oc apply \
-  --filename {d0-examples}/d0-netpol-allow-router.yaml
+  --filename {vmware-admins-examples}/netpol-allow-router.yaml
 ----
 
 [source,sh,role=execute]

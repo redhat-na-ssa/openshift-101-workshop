@@ -1,0 +1,32 @@
+= OpenShift Fundamentals
+
+This workshop covers what OpenShift is, how it differs from Kubernetes, and how to work with it: the web console and the `oc` command line, projects, building and deploying an application from source code, and exposing it with Routes.
+Attendees who are new to containers and Kubernetes can take Containers and Kubernetes for VMware Admins first.
+
+Before you start, make sure your environment meets the xref:setup-requirements.adoc[Setup Requirements].
+
+== Outcomes
+
+By the end of this workshop, participants will be equipped with foundational knowledge and hands-on experience working with OpenShift. The following learning outcomes are expected:
+
+* **Understand the Components that Comprise OpenShift**: Gain insight into the architecture of OpenShift, including its control plane, worker nodes, developer tools, and platform services.
+
+* **Outline the Differences Between OpenShift and Kubernetes**: Identify how OpenShift builds upon Kubernetes by adding developer-focused tools, enterprise features, and integrated services.
+
+* **Interact with an OpenShift Cluster**: Learn how to navigate and manage resources using both the OpenShift web console and the command-line interface (`oc`).
+
+* **Manage Projects and Resources**: Understand how to create and manage OpenShift *projects*, and how to organize, monitor, and maintain the resources within them.
+
+* **Create Applications from Source Code**: Build container images locally with Podman, then use OpenShift's native builds (`oc new-build`, `oc new-app`) and Helm to build and package applications inside the cluster—without requiring a local Docker daemon.
+
+* **Expose Applications with Customized Routing**: Learn how to create and configure OpenShift *routes* to expose services externally, including path-based and weighted routing, TLS termination, and annotation-based settings.
+
+== Modules
+
+. xref:01-background.adoc[Background]: why you might use OpenShift for application development.
+. xref:02-whatisopenshift.adoc[What is OpenShift?]: the components used to run OpenShift.
+. xref:03-ocp-vs-k8s.adoc[OpenShift vs Kubernetes]: how OpenShift and Kubernetes differ.
+. xref:04-cli-and-console.adoc[Command Line Interface and Web Console]: OpenShift's most common interfaces.
+. xref:05-projects.adoc[Projects]: OpenShift's workspace resource.
+. xref:06-application-deployment.adoc[Application Deployment]: how to create an application image from source code and package it for OpenShift.
+. xref:07-openshift-networking.adoc[Networking]: configuration options for exposing application traffic.
