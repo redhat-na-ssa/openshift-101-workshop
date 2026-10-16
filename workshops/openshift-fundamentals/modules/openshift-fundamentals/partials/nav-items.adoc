@@ -1,0 +1,10 @@
+// This workshop's pages. Its nav.adoc includes this list when the workshop is built
+// alone, and the site's navigation includes it under Workshop Content, so the list
+// starts at the third level and every xref names this module.
+*** xref:openshift-fundamentals:01-background.adoc[Background]
+*** xref:openshift-fundamentals:02-whatisopenshift.adoc[What is OpenShift?]
+*** xref:openshift-fundamentals:03-ocp-vs-k8s.adoc[OpenShift vs Kubernetes]
+*** xref:openshift-fundamentals:04-cli-and-console.adoc[Command Line Interface and Web Console]
+*** xref:openshift-fundamentals:05-projects.adoc[Projects]
+*** xref:openshift-fundamentals:06-application-deployment.adoc[Application Deployment]
+*** xref:openshift-fundamentals:07-openshift-networking.adoc[Networking]
