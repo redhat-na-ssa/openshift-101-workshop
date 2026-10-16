@@ -4,3 +4,12 @@ https://redhat-na-ssa.github.io/openshift-101-workshop/[Workshop Link]
 
 
 The site's look (theme, CSS, tabs, copy buttons, footer) and the Pages and PDF workflows come from https://github.com/shpwrck/workshop-common[workshop-common], which the other workshop repos share; change them there.
+
+To preview the site, clone https://github.com/shpwrck/workshop-common[workshop-common] next to this repository and run this from this repository's folder:
+
+[source,bash]
+----
+../workshop-common/scripts/preview.sh --watch
+----
+
+It builds the site the way the Pages workflow does, serves it on http://localhost:8080/ and rebuilds it when you save a change.

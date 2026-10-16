@@ -5,7 +5,7 @@ on:
     paths:
       - 'content/**'
       - 'default-pdf.yml'
-      - 'assembler.yml'
+      - 'antora-assembler.yml'
       - 'Gemfile'
   workflow_dispatch:  # Allow manual testing
 
