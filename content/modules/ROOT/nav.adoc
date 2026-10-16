@@ -1,5 +1,6 @@
 * xref:index.adoc[Workshop home]
 * xref:instructor.adoc[Workshop instructor]
+** xref:downloads.adoc[Downloads]
 ** xref:containers-for-vmware-admins:setup-requirements.adoc[Containers and Kubernetes for VMware Admins]
 ** xref:openshift-fundamentals:setup-requirements.adoc[OpenShift Fundamentals]
 ** xref:running-applications:setup-requirements.adoc[Running Applications]

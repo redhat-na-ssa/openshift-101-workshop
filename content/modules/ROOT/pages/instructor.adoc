@@ -57,6 +57,8 @@ The workshop environment can provide the terminal and the web console side by si
 Shared by all the workshops: attendees who don't want to install the command-line tools run the workshop CLI tools image on the cluster, as xref:cli-tools.adoc[Shared CLI tools] describes.
 Make sure attendees can pull that image, or mirror it for a disconnected cluster.
 
+xref:downloads.adoc[Downloads] has every file of the release: the PDF, the Helm chart, the list of images to mirror and the guide for running the workshop in a disconnected cluster.
+
 == Suggested Delivery Orders
 
 The workshops build on each other in the order listed, and each one stands on its own.
