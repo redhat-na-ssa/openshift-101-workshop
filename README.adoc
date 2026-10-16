@@ -26,9 +26,6 @@ The site is one Antora component, so a single navigation spans every workshop.
 |`workshops/running-applications/`
 |Running Applications.
 
-|`content/lib/dev-mode.js`
-|An Antora extension that lists the site's attributes on an extra page. It is turned off in both playbooks.
-
 |`tools/install.sh`
 |The command-line tools the workshops need beyond the shared ones, for the release's tools image (none so far).
 
