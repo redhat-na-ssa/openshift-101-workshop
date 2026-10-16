@@ -1,7 +1,4 @@
+// The pages are listed in partials/nav-items.adoc, which the full site's
+// navigation also includes, under Workshop Content.
 .xref:index.adoc[Containers and Kubernetes for VMware Admins]
-* xref:concept-map.adoc[Concept Map: vSphere to OpenShift]
-* xref:01-vms-to-containers.adoc[From Virtual Machines to Containers]
-* xref:02-kubernetes-building-blocks.adoc[Kubernetes Building Blocks]
-* xref:03-what-openshift-adds.adoc[What OpenShift Adds]
-* xref:04-config-storage-networking.adoc[Configuration, Storage and Networking]
-* xref:05-day-two-troubleshooting.adoc[Day-2 Basics and Troubleshooting]
+include::partial$nav-items.adoc[]

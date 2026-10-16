@@ -1,0 +1,9 @@
+// This workshop's pages. Its nav.adoc includes this list when the workshop is built
+// alone, and the site's navigation includes it under Workshop Content, so the list
+// starts at the third level and every xref names this module.
+*** xref:running-applications:01-container-lifecycle.adoc[Container Lifecycle]
+*** xref:running-applications:02-managing-configuration.adoc[Managing Configuration]
+*** xref:running-applications:03-observability.adoc[Observability]
+*** xref:running-applications:04-scaling-applications.adoc[Scaling Applications]
+*** xref:running-applications:05-debugging-applications.adoc[Debugging Applications]
+*** xref:running-applications:06-deployment-strategies.adoc[Deployment Strategies]

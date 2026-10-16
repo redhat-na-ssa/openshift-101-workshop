@@ -1,9 +1,17 @@
-* xref:index.adoc[Workshop home]
-* xref:instructor.adoc[Workshop instructor]
+* xref:index.adoc[Workshop Home]
+* xref:instructor.adoc[Workshop Instructor Guide]
 ** xref:downloads.adoc[Downloads]
 ** xref:containers-for-vmware-admins:setup-requirements.adoc[Containers and Kubernetes for VMware Admins]
 ** xref:openshift-fundamentals:setup-requirements.adoc[OpenShift Fundamentals]
 ** xref:running-applications:setup-requirements.adoc[Running Applications]
 // add-workshop.py adds workshops above this line
-* xref:attendee.adoc[Workshop attendee]
+* xref:attendee.adoc[Workshop Attendee Guide]
 ** xref:cli-tools.adoc[Shared CLI tools]
+* Workshop Content
+** xref:containers-for-vmware-admins:index.adoc[Containers and Kubernetes for VMware Admins]
+include::containers-for-vmware-admins:partial$nav-items.adoc[]
+** xref:openshift-fundamentals:index.adoc[OpenShift Fundamentals]
+include::openshift-fundamentals:partial$nav-items.adoc[]
+** xref:running-applications:index.adoc[Running Applications]
+include::running-applications:partial$nav-items.adoc[]
+// add-workshop.py adds workshops above this line

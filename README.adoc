@@ -1,7 +1,7 @@
 = OpenShift 101 Workshop
 
 This repo holds the OpenShift 101 Workshop site: three workshops that take attendees from containers and Kubernetes basics to building, running and troubleshooting applications on OpenShift.
-Attendees and instructors use the site, https://redhat-na-ssa.github.io/openshift-101-workshop/[redhat-na-ssa.github.io/openshift-101-workshop]: its *Workshop instructor* page has what an instructor needs to run a delivery, and its *Workshop attendee* page is where attendees start.
+Attendees and instructors use the site, https://redhat-na-ssa.github.io/openshift-101-workshop/[redhat-na-ssa.github.io/openshift-101-workshop]: its *Workshop Instructor Guide* page has what an instructor needs to run a delivery, and its *Workshop Attendee Guide* page is where attendees start.
 This README is for the people who maintain the workshops.
 
 The site look, the PDF look, the build and release workflows and the Helm chart come from https://github.com/shpwrck/workshop-common[workshop-common], which the other workshop repos share, so change those there.
@@ -15,7 +15,7 @@ The site is one Antora component, so a single navigation spans every workshop.
 |Path |What it holds
 
 |`content/`
-|The home part: the Workshop home, Workshop instructor and Workshop attendee pages, and the `antora.yml` whose title, navigation and attributes the whole site uses.
+|The home part: the Workshop Home, Workshop Instructor Guide and Workshop Attendee Guide pages, and the `antora.yml` whose title, navigation and attributes the whole site uses.
 
 |`workshops/containers-for-vmware-admins/`
 |Containers and Kubernetes for VMware Admins.
@@ -69,7 +69,7 @@ From this repo's folder:
 ../workshop-common/scripts/add-workshop.py NAME "Title"
 ----
 
-It creates `workshops/NAME` from the workshop template and lists it in both playbooks, in `content/antora.yml` and on the home, instructor and attendee pages.
+It creates `workshops/NAME` from the workshop template and lists it in both playbooks, in the home part's navigation and on the home, instructor and attendee pages.
 Then write its pages, fill in its row on the instructor page and its setup requirements.
 
 == Releases
