@@ -8,10 +8,10 @@ asciidoc:
   attributes:
     lab_name: "OpenShift Primer"
     release-version: master
-    d0-examples: https://raw.githubusercontent.com/shpwrck/openshift-101-workshop/main/content/modules/ROOT/examples
+    d0-examples: https://raw.githubusercontent.com/redhat-na-ssa/openshift-101-workshop/main/content/modules/ROOT/examples
     page-pagination: true
     page-links:
-    - url: https://github.com/shpwrck/retail-store-sample-app
+    - url: https://github.com/redhat-na-ssa/retail-store-sample-app
       text: Application Source Repository
     - url: https://github.com/rhobs/prometheus-example-app
       text: Prometheus Example Source Repository

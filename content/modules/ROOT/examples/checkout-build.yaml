@@ -14,7 +14,7 @@ spec:
   source:
     contextDir: /src/checkout
     git:
-      url: 'https://github.com/shpwrck/retail-store-sample-app.git'
+      url: 'https://github.com/redhat-na-ssa/retail-store-sample-app.git'
     type: Git
   strategy:
     kind: ClusterBuildStrategy

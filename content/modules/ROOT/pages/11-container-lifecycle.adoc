@@ -120,7 +120,7 @@ spec:
     local: false
 status:
   dockerImageRepository: image-registry.openshift-image-registry.svc:5000/default/retail-cart
-  publicDockerImageRepository: default-route-openshift-image-registry.apps.ms01.k8socp.com/default/retail-cart
+  publicDockerImageRepository: default-route-openshift-image-registry.apps.cluster.example.com/default/retail-cart
   tags:
   - items:
     - created: "2025-04-09T15:43:06Z"

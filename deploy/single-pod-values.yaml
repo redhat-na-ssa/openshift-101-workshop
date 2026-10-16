@@ -6,7 +6,7 @@
 guid: test
 
 deployer:
-  domain: apps.ms01.k8socp.com
+  domain: apps.cluster.example.com  # set to your cluster's apps domain
 
 proxy:
   image: quay.io/rhpds/nginx:1.25
@@ -16,7 +16,7 @@ content:
   contentOnly: "false"
   image: ghcr.io/rhpds/showroom-content:prod
   imagePullPolicy: IfNotPresent
-  repoUrl: https://github.com/shpwrck/openshift-primer.git 
+  repoUrl: https://github.com/redhat-na-ssa/openshift-101-workshop.git
   repoRef: main
   antoraPlaybook: default-site.yml
   resources:
