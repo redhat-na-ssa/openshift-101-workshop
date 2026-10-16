@@ -54,6 +54,9 @@ Every workshop needs:
 
 The workshop environment can provide the terminal and the web console side by side with the pages: `deploy/single-pod-values.yaml` in the repository holds the Helm values for running the site with a terminal and a console in Showroom.
 
+Shared by all the workshops: attendees who don't want to install the command-line tools run the workshop CLI tools image on the cluster, as xref:cli-tools.adoc[Shared CLI tools] describes.
+Make sure attendees can pull that image, or mirror it for a disconnected cluster.
+
 == Suggested Delivery Orders
 
 The workshops build on each other in the order listed, and each one stands on its own.
