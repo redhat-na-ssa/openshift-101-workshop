@@ -325,7 +325,7 @@ ifdef::full-site[]
 endif::[]
 * https://developers.redhat.com/developer-sandbox[Red Hat Developer Sandbox]: a free OpenShift project to keep practising in.
 * https://www.redhat.com/en/interactive-labs/openshift[Red Hat interactive labs for OpenShift]: short guided exercises in the browser.
-* Once you're comfortable, the OpenShift 102 workshops on https://redhat-na-ssa.github.io/openshift-102-workshop/deploy-workshop/index.html[pod scheduling], https://redhat-na-ssa.github.io/openshift-102-workshop/helm-workshop/index.html[Helm], https://redhat-na-ssa.github.io/openshift-102-workshop/prometheus-workshop/index.html[Prometheus queries] and https://redhat-na-ssa.github.io/openshift-102-workshop/istio-workshop/index.html[service mesh], and the https://redhat-na-ssa.github.io/ocp-cloud-workshop/[OpenShift on AWS and Azure] workshop.
+* Once you're comfortable, the OpenShift 102 workshops on https://redhat-na-ssa.github.io/openshift-102-workshop/deploy/index.html[pod scheduling], https://redhat-na-ssa.github.io/openshift-102-workshop/helm/index.html[Helm], https://redhat-na-ssa.github.io/openshift-102-workshop/prometheus/index.html[Prometheus queries] and https://redhat-na-ssa.github.io/openshift-102-workshop/istio/index.html[service mesh], and the https://redhat-na-ssa.github.io/openshift-103-workshop/rosa-and-aro/index.html[OpenShift on ROSA and ARO] workshop.
 
 [#recap]
 == What Changes for You

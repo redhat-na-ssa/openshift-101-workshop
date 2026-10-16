@@ -4,7 +4,7 @@ This repo holds the OpenShift 101 Workshop site: three workshops that take atten
 Attendees and instructors use the site, https://redhat-na-ssa.github.io/openshift-101-workshop/[redhat-na-ssa.github.io/openshift-101-workshop]: its *Workshop instructor* page has what an instructor needs to run a delivery, and its *Workshop attendee* page is where attendees start.
 This README is for the people who maintain the workshops.
 
-The site look, the PDF look and the build workflows come from https://github.com/shpwrck/workshop-common[workshop-common], which the other workshop repos share, so change those there.
+The site look, the PDF look, the build and release workflows and the Helm chart come from https://github.com/shpwrck/workshop-common[workshop-common], which the other workshop repos share, so change those there.
 
 == Layout
 
@@ -28,6 +28,9 @@ The site is one Antora component, so a single navigation spans every workshop.
 
 |`content/lib/dev-mode.js`
 |An Antora extension that lists the site's attributes on an extra page. It is turned off in both playbooks.
+
+|`tools/install.sh`
+|The command-line tools the workshops need beyond the shared ones, for the release's tools image (none so far).
 
 |`deploy/`
 |Helm values for running the site with a terminal and a web console in Showroom.
@@ -74,4 +77,7 @@ Then write its pages, fill in its row on the instructor page and its setup requi
 
 == Releases
 
-To publish a release with its PDF, run the *Build and Release PDF Documentation* workflow from the Actions tab with the next version, such as `v1.0.0`, or push a tag of that name.
+Run the *Release* workflow from the Actions tab with the next version, such as `v1.1.0`, or push a tag of that name.
+It publishes the PDF, the runtime and tools images, the Helm chart and an offline bundle; see "Releases" in workshop-common's README.
+The tools image has only the shared tools; `tools/install.sh` adds none.
+The one other command-line tool the pages use, `podman`, runs on an attendee's workstation or the instructor's Linux host, because the tools pod has no container engine.

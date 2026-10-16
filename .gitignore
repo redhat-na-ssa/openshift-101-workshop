@@ -8,10 +8,6 @@ node_modules/
 www/
 .cache/
 
-# Playbooks the workshop-common scripts write while building one workshop alone
-.preview-playbook.yml
-.standalone*.yml
-
 # Ignore IDE and editor files
 .vscode/
 .idea/
@@ -44,3 +40,10 @@ yarn.lock
 
 # Don't duplicate Assets
 build/assembler/modules/_images/
+
+# Release builds and local previews
+.offline-chart/
+.preview-playbook.yml
+.standalone-*.yml
+.standalone.yml
+.workshop-common/
